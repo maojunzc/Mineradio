@@ -20447,7 +20447,7 @@ function renderUserFxArchives() {
       : '<button type="button" onclick="applyUserFxArchive(' + index + ')"' + (hasSave ? '' : ' disabled') + '>应用</button>' +
         '<button type="button" onclick="saveUserFxArchive(' + index + ')">保存</button>' +
         '<button type="button" onclick="renameUserFxArchive(' + index + ')">命名</button>' +
-        '<button type="button" onclick="exportUserFxArchive(' + index + ')"' + (hasSave ? '' : ' disabled') + '>导出</button>' +
+        '<button type="button" class="glass-saved-button" onclick="exportUserFxArchive(' + index + ')"' + (hasSave ? '' : ' disabled') + '>导出</button>' +
         '<button type="button" onclick="removeUserFxArchive(' + index + ')">删除</button>';
     return '<div class="user-archive-slot' + (hasSave ? ' has-save' : '') + '" data-slot="' + index + '">' +
       nameHtml +

@@ -334,36 +334,130 @@ Function MineradioUseFirstAvailableInstallDir
     Return
 FunctionEnd
 
+; MineradioHasPreferredInstallDrive
+; 检测 D-Z 之间是否存在本地固定磁盘（非网络驱动器、非可移动介质）。
+; 使用 GetDriveTypeA Win32 API 准确区分驱动器类型。
+; DRIVE_UNKNOWN=0, DRIVE_NO_ROOT_DIR=1, DRIVE_REMOVABLE=2,
+; DRIVE_FIXED=3, DRIVE_REMOTE=4, DRIVE_CDROM=5, DRIVE_RAMDISK=6
+; 仅当存在至少一个本地固定磁盘（DRIVE_FIXED=3）时才返回 1。
 Function MineradioHasPreferredInstallDrive
-  IfFileExists "D:\*.*" hasPreferred 0
-  IfFileExists "E:\*.*" hasPreferred 0
-  IfFileExists "F:\*.*" hasPreferred 0
-  IfFileExists "G:\*.*" hasPreferred 0
-  IfFileExists "H:\*.*" hasPreferred 0
-  IfFileExists "I:\*.*" hasPreferred 0
-  IfFileExists "J:\*.*" hasPreferred 0
-  IfFileExists "K:\*.*" hasPreferred 0
-  IfFileExists "L:\*.*" hasPreferred 0
-  IfFileExists "M:\*.*" hasPreferred 0
-  IfFileExists "N:\*.*" hasPreferred 0
-  IfFileExists "O:\*.*" hasPreferred 0
-  IfFileExists "P:\*.*" hasPreferred 0
-  IfFileExists "Q:\*.*" hasPreferred 0
-  IfFileExists "R:\*.*" hasPreferred 0
-  IfFileExists "S:\*.*" hasPreferred 0
-  IfFileExists "T:\*.*" hasPreferred 0
-  IfFileExists "U:\*.*" hasPreferred 0
-  IfFileExists "V:\*.*" hasPreferred 0
-  IfFileExists "W:\*.*" hasPreferred 0
-  IfFileExists "X:\*.*" hasPreferred 0
-  IfFileExists "Y:\*.*" hasPreferred 0
-  IfFileExists "Z:\*.*" hasPreferred 0
-  Push "0"
-  Return
-
-  hasPreferred:
+  System::Call 'kernel32::GetDriveTypeA(t "D:\") i .R0'
+  ${If} $R0 == 3
     Push "1"
     Return
+  ${EndIf}
+  System::Call 'kernel32::GetDriveTypeA(t "E:\") i .R0'
+  ${If} $R0 == 3
+    Push "1"
+    Return
+  ${EndIf}
+  System::Call 'kernel32::GetDriveTypeA(t "F:\") i .R0'
+  ${If} $R0 == 3
+    Push "1"
+    Return
+  ${EndIf}
+  System::Call 'kernel32::GetDriveTypeA(t "G:\") i .R0'
+  ${If} $R0 == 3
+    Push "1"
+    Return
+  ${EndIf}
+  System::Call 'kernel32::GetDriveTypeA(t "H:\") i .R0'
+  ${If} $R0 == 3
+    Push "1"
+    Return
+  ${EndIf}
+  System::Call 'kernel32::GetDriveTypeA(t "I:\") i .R0'
+  ${If} $R0 == 3
+    Push "1"
+    Return
+  ${EndIf}
+  System::Call 'kernel32::GetDriveTypeA(t "J:\") i .R0'
+  ${If} $R0 == 3
+    Push "1"
+    Return
+  ${EndIf}
+  System::Call 'kernel32::GetDriveTypeA(t "K:\") i .R0'
+  ${If} $R0 == 3
+    Push "1"
+    Return
+  ${EndIf}
+  System::Call 'kernel32::GetDriveTypeA(t "L:\") i .R0'
+  ${If} $R0 == 3
+    Push "1"
+    Return
+  ${EndIf}
+  System::Call 'kernel32::GetDriveTypeA(t "M:\") i .R0'
+  ${If} $R0 == 3
+    Push "1"
+    Return
+  ${EndIf}
+  System::Call 'kernel32::GetDriveTypeA(t "N:\") i .R0'
+  ${If} $R0 == 3
+    Push "1"
+    Return
+  ${EndIf}
+  System::Call 'kernel32::GetDriveTypeA(t "O:\") i .R0'
+  ${If} $R0 == 3
+    Push "1"
+    Return
+  ${EndIf}
+  System::Call 'kernel32::GetDriveTypeA(t "P:\") i .R0'
+  ${If} $R0 == 3
+    Push "1"
+    Return
+  ${EndIf}
+  System::Call 'kernel32::GetDriveTypeA(t "Q:\") i .R0'
+  ${If} $R0 == 3
+    Push "1"
+    Return
+  ${EndIf}
+  System::Call 'kernel32::GetDriveTypeA(t "R:\") i .R0'
+  ${If} $R0 == 3
+    Push "1"
+    Return
+  ${EndIf}
+  System::Call 'kernel32::GetDriveTypeA(t "S:\") i .R0'
+  ${If} $R0 == 3
+    Push "1"
+    Return
+  ${EndIf}
+  System::Call 'kernel32::GetDriveTypeA(t "T:\") i .R0'
+  ${If} $R0 == 3
+    Push "1"
+    Return
+  ${EndIf}
+  System::Call 'kernel32::GetDriveTypeA(t "U:\") i .R0'
+  ${If} $R0 == 3
+    Push "1"
+    Return
+  ${EndIf}
+  System::Call 'kernel32::GetDriveTypeA(t "V:\") i .R0'
+  ${If} $R0 == 3
+    Push "1"
+    Return
+  ${EndIf}
+  System::Call 'kernel32::GetDriveTypeA(t "W:\") i .R0'
+  ${If} $R0 == 3
+    Push "1"
+    Return
+  ${EndIf}
+  System::Call 'kernel32::GetDriveTypeA(t "X:\") i .R0'
+  ${If} $R0 == 3
+    Push "1"
+    Return
+  ${EndIf}
+  System::Call 'kernel32::GetDriveTypeA(t "Y:\") i .R0'
+  ${If} $R0 == 3
+    Push "1"
+    Return
+  ${EndIf}
+  System::Call 'kernel32::GetDriveTypeA(t "Z:\") i .R0'
+  ${If} $R0 == 3
+    Push "1"
+    Return
+  ${EndIf}
+  Push "0"
+  Return
 FunctionEnd
 
 Function MineradioNormalizeInstallDir

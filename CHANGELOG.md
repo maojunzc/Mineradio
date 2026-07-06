@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.1.2 (fork 维护首版)
+
+- [#265] 修复安装器将网络驱动器误判为本地磁盘的问题（`MineradioHasPreferredInstallDrive` 改用 `GetDriveTypeA` 排除 `DRIVE_REMOTE`）
+- [#235] 修复视觉控制台导出按钮缺少玻璃质感样式的问题（补 `class="glass-saved-button"`）
+- 清理原作者信息与个人链接
+- 新增 `docs/CODEGRAPH.md` 代码图谱，方便后续维护
+
 ## v1.1.1
 
 - P0 installer safety fix: installation now defaults to the first available non-C drive from `D:\Mineradio` through `Z:\Mineradio`; it falls back to `C:\Mineradio` only when no D-Z drive exists.
