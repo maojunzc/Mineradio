@@ -15,20 +15,20 @@
 Release tag：
 
 ```text
-v<版本号>
+v1.1.1
 ```
 
 Release 标题：
 
 ```text
-Mineradio v<版本号>
+Mineradio v1.1.1 自维护首版
 ```
 
 建议上传资产：
 
-- `dist/Mineradio-<版本号>-Setup.exe`
-- `dist/Mineradio-<版本号>-Setup.exe.blockmap`（可选）
-- `dist/Mineradio-<版本号>-SHA256SUMS.txt`
+- `dist/Mineradio-1.1.1-Setup.exe`
+- `dist/Mineradio-1.1.1-Setup.exe.blockmap`（可选）
+- `dist/Mineradio-1.1.1-SHA256SUMS.txt`
 
 ## 更新检测
 
