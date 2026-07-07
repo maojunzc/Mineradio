@@ -16441,33 +16441,13 @@ function searchGenre(genre) {
     input.value = genre;
     input.focus();
     setSearchMode('song');
-    if (typeof handleSearch === 'function') handleSearch();
+    if (typeof doSearch === 'function') doSearch(genre);
   }
 }
 
 // ── 触发天气电台 ──
 function triggerWeatherRadio() {
-  var weatherChip = document.getElementById('home-weather-chip');
-  if (weatherChip) { weatherChip.textContent = '☁️ 获取天气中…'; weatherChip.disabled = true; }
-  fetch('/api/weather/ip-location').then(function(r){ return r.json(); }).then(function(data){
-    var loc = data && data.location;
-    if (loc && loc.city && loc.lat && loc.lon) {
-      return fetch('/api/weather/radio?city=' + encodeURIComponent(loc.city) + '&lat=' + loc.lat + '&lon=' + loc.lon + '&timezone=' + encodeURIComponent(loc.timezone || ''));
-    }
-    return fetch('/api/weather/radio?city=北京&lat=39.9&lon=116.4&timezone=Asia/Shanghai');
-  }).then(function(r){ return r.json(); }).then(function(data){
-    if (weatherChip) { weatherChip.textContent = '☁️ 天气电台'; weatherChip.disabled = false; }
-    if (data && data.radio && data.radio.songs && data.radio.songs.length) {
-      if (typeof playQueue === 'function') {
-        playQueue(data.radio.songs, 0, { mode: 'weather' });
-      }
-    } else {
-      showToast('天气电台暂无结果');
-    }
-  }).catch(function(){
-    if (weatherChip) { weatherChip.textContent = '☁️ 天气电台'; weatherChip.disabled = false; }
-    showToast('天气电台加载失败');
-  });
+  startWeatherRadio();
 }
 
 // ── 显示搜索框 ──
