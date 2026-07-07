@@ -2,13 +2,7 @@
 
 ## Supported Versions
 
-当前只维护最新公开版本。
-
-## Installer Safety Notice
-
-旧安装包（`v1.0.10` 及更早）不再建议继续安装或传播。请将旧 `.exe` 安装包视为不可信历史产物并隔离保留；需要安装 Mineradio 时，请使用本仓库 Release 中的最新版本安装包。
-
-新版本不作为旧版的软件内本地更新包发布时，旧版本用户请手动下载新版安装包，卸载旧版本后进行纯净安装。
+当前只维护最新公开版本。建议始终使用 [Releases](https://github.com/maojunzc/Mineradio/releases) 中的最新版。
 
 ## Reporting a Vulnerability
 

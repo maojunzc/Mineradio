@@ -1,6 +1,6 @@
-# Mineradio Project Memory — 私人维护版
+# Mineradio Project Memory
 
-本文件用于解决新开 AI 对话时"失忆"的问题。每次用户明确说"保留""喜欢""这个很好""记住""保存一下"等表达时，要把关键结论追加到这里。
+本文件记录项目开发过程中确认保留的设计决策和交互边界，供后续维护者快速了解项目状态。
 
 ## Stable Project Facts
 
