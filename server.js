@@ -3987,6 +3987,30 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  // ---------- 从歌单移除歌曲 ----------
+  if (pn === '/api/playlist/remove-song') {
+    try {
+      const info = await requireLogin(res);
+      if (!info) return;
+      const body = req.method === 'POST' ? await readRequestBody(req) : {};
+      const pid = body.pid || url.searchParams.get('pid');
+      const id = body.id || body.ids || url.searchParams.get('id') || url.searchParams.get('ids');
+      if (!pid || !id) { sendJSON(res, { error: 'Missing playlist id or song id' }, 400); return; }
+      const r = await playlist_tracks({ op: 'del', pid, tracks: String(id), cookie: userCookie, timestamp: Date.now() });
+      const code = normalizeApiCode(r);
+      const msg  = normalizeApiMessage(r);
+      if (code === 200) {
+        sendJSON(res, { loggedIn: true, pid, id, success: true });
+      } else {
+        sendJSON(res, { loggedIn: true, pid, id, success: false, code, error: msg || 'PLAYLIST_REMOVE_FAILED' });
+      }
+    } catch (err) {
+      console.error('[PlaylistRemoveSong]', err);
+      sendJSON(res, { error: err.message }, 500);
+    }
+    return;
+  }
+
   // ---------- 歌词 ----------
   if (pn === '/api/lyric') {
     try {

@@ -19989,6 +19989,7 @@ function playlistPanelDetailHtml(pl, provider) {
           imgTag +
           '<div style="flex:1;min-width:0"><div class="pl-detail-row-title">' + escHtml(song.name || '') + '</div>' +
           '<button type="button" class="pl-detail-row-artist" data-pl-detail-artist="' + i + '">' + escHtml(song.artist || '未知歌手') + '</button></div>' +
+          '<button type="button" class="fx-mini-btn ghost" onclick="event.stopPropagation();removeTrackFromPlaylist(' + i + ')" title="从歌单删除" style="height:24px;width:24px;padding:0;font-size:12px;line-height:1;border-radius:6px;flex-shrink:0">×</button>' +
         '</div>';
       }).join('');
   if (!loading && !rows) rows = '<div style="text-align:center;padding:14px 0;color:rgba(255,255,255,.30);font-size:11.5px">歌单暂无可播放歌曲</div>';
@@ -20067,6 +20068,38 @@ async function openPlaylistPanelDetail(provider, pid, title) {
     playlistPanelDetailState.renderLimit = PLAYLIST_DETAIL_INITIAL_RENDER;
     renderPlaylistPanelDetailState();
     showToast('歌单详情加载失败');
+  }
+}
+
+// ── 从歌单删除歌曲 ──
+async function removeTrackFromPlaylist(index) {
+  if (!playlistPanelDetailState || !playlistPanelDetailState.key || !playlistPanelDetailState.tracks) return;
+  var key = playlistPanelDetailState.key;
+  var tracks = playlistPanelDetailState.tracks;
+  if (index < 0 || index >= tracks.length) return;
+  var song = tracks[index];
+  if (!song || !song.id) { showToast('无法删除：歌曲 ID 缺失'); return; }
+  // 解析 key 获取 provider 和 pid
+  var sep = key.indexOf('|');
+  if (sep < 0) { showToast('无法删除：歌单信息异常'); return; }
+  var provider = key.substring(0, sep);
+  var pid = key.substring(sep + 1);
+  if (!pid) { showToast('无法删除：歌单 ID 缺失'); return; }
+
+  if (!confirm('确定从歌单中移除「' + (song.name || '') + '」吗？')) return;
+
+  try {
+    var url = provider === 'qq' ? '/api/qq/playlist/remove-song' : '/api/playlist/remove-song';
+    var body = await apiJson(url, { method: 'POST', body: { pid: pid, id: song.id } });
+    if (body && body.success) {
+      tracks.splice(index, 1);
+      renderPlaylistPanelDetailState();
+      showToast('已从歌单移除');
+    } else {
+      showToast('删除失败：' + (body && body.error || '未知错误'));
+    }
+  } catch (err) {
+    showToast('删除失败：' + (err.message || '网络错误'));
   }
 }
 function playPlaylistPanelDetail() {
@@ -23018,10 +23051,15 @@ function setShelfCameraMode(mode) {
 function setShelfPresence(mode) {
   fx.shelfPresence = normalizeShelfPresence(mode);
   updateShelfControlUi();
-  if (shelfManager && shelfManager.setMode) shelfManager.setMode(fx.shelf);
-  if (fx.shelfPresence === 'auto' && !shelfPinnedOpen) {
+  if (fx.shelfPresence === 'auto') {
     shelfHoverCue.target = 0;
+    // 舞台模式下切到自动隐藏时，确保歌单架收起
+    if (fx.shelf === 'stage') {
+      if (shelfPinnedOpen && typeof setShelfPinnedOpen === 'function') setShelfPinnedOpen(false, true);
+      if (shelfManager && typeof shelfManager.closeAllContent === 'function') shelfManager.closeAllContent();
+    }
   }
+  if (shelfManager && shelfManager.setMode) shelfManager.setMode(fx.shelf);
   saveLyricLayout();
   showToast(fx.shelfPresence === 'always' ? '3D歌单架: 常驻' : '3D歌单架: 自动隐藏');
 }

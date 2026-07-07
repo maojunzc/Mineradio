@@ -836,8 +836,7 @@ Function MineradioValidateInstallDir
       ${If} $2 == "1"
       ${AndIf} $3 != "1"
       ${AndIf} $4 != "1"
-        MessageBox MB_ICONSTOP|MB_OK "检测到这台电脑还有 D-Z 盘，Mineradio 不安装到 C 盘。请改选 D 盘或其它非 C 盘的 Mineradio 文件夹。$\r$\n$\r$\n如果电脑只有 C 盘，安装器会自动放行 C:\Mineradio。"
-        Abort
+        MessageBox MB_ICONSTOP|MB_OK "检测到这台电脑还有 D-Z 盘，Mineradio 默认不安装到 C 盘。$\r$\n$\r$\n如果确实需要安装到 C 盘，请选择「浏览」手动指定 C:\Mineradio。"
       ${EndIf}
     ${EndIf}
   ${EndIf}
