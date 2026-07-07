@@ -18068,6 +18068,7 @@ function mergeSongSearchResults(neteaseSongs, qqSongs, limit, q, extraSongs) {
   }
   (neteaseSongs || []).forEach(function(song, i){ push(song, i); });
   (qqSongs || []).forEach(function(song, i){ push(song, i); });
+  (extraSongs || []).forEach(function(song, i){ push(song, 10 + i); });
   out.sort(function(a, b){ return (b._searchScore || 0) - (a._searchScore || 0); });
   return out.slice(0, limit);
 }
@@ -18596,6 +18597,8 @@ function bindVolumeControls() {
 function queueItemKey(song) {
   if (!song) return '';
   if (song.provider === 'qq' || song.source === 'qq' || song.type === 'qq') return 'qq:' + (song.mid || song.songmid || song.id || (song.name + '|' + song.artist));
+  if (song.provider === 'kuwo' || song.source === 'kuwo') return 'kuwo:' + (song.mid || song.id || (song.name + '|' + song.artist));
+  if (song.provider === 'kugou' || song.source === 'kugou') return 'kugou:' + (song.mid || song.id || (song.name + '|' + song.artist));
   if (song.type === 'podcast' && song.programId) return 'podcast:' + song.programId;
   if (song.localKey) return 'local:' + song.localKey;
   if (song.id != null && song.id !== '') return 'song:' + song.id;
