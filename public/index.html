@@ -2500,9 +2500,17 @@ html.control-glass-svg-ok #visual-guide-btn:hover{
         <div class="mini-queue-title">当前队列</div>
         <div id="mini-queue-count" class="mini-queue-count">0 首</div>
       </div>
-      <button class="fx-mini-btn ghost" onclick="closeMiniQueue()" title="关闭" style="height:26px;padding:0 9px;font-size:13px">×</button>
+      <div style="display:flex;gap:4px">
+        <button class="fx-mini-btn ghost" onclick="clearQueue()" title="清空队列" style="height:26px;padding:0 9px;font-size:13px">清空</button>
+        <button class="fx-mini-btn ghost" onclick="closeMiniQueue()" title="关闭" style="height:26px;padding:0 9px;font-size:13px">×</button>
+      </div>
+    </div>
+    <div class="mini-queue-tabs" style="display:flex;gap:4px;margin-bottom:8px">
+      <button class="mini-queue-tab active" data-qt="queue" onclick="switchQueueTab('queue')" style="padding:4px 12px;border:1px solid rgba(255,255,255,.08);border-radius:999px;background:rgba(0,245,212,.12);color:#fff;font-size:11px;font-weight:600;cursor:pointer">队列</button>
+      <button class="mini-queue-tab" data-qt="history" onclick="switchQueueTab('history')" style="padding:4px 12px;border:1px solid rgba(255,255,255,.08);border-radius:999px;background:transparent;color:rgba(255,255,255,.55);font-size:11px;font-weight:600;cursor:pointer">历史</button>
     </div>
     <div id="mini-queue-list" class="mini-queue-list"></div>
+    <div id="mini-history-list" class="mini-queue-list" style="display:none"></div>
   </div>
   <div id="progress-bar"><div id="progress-fill"></div><div id="progress-thumb" aria-hidden="true"></div></div>
   <div id="controls">
@@ -18863,6 +18871,7 @@ async function playQueueAt(idx, opts) {
     forcePlaybackControlsInteractive();
     markPlayPhase('session-begin');
     safePlaybackStep('listen-session-begin', function(){ beginListenSession(song, playbackContext); });
+    safePlaybackStep('play-history', function(){ recordPlayHistory(song); });
     markPlayPhase('lyrics-fetch');
     if (song.type === 'podcast') {
       safePlaybackStep('podcast-lyrics', function(){
@@ -19650,11 +19659,51 @@ function renderMiniQueuePanel(opts) {
       if (opts.animate) animateListItems($list, '.mini-queue-item', { x: 0, y: 6, stagger: 0.01, duration: 0.20, limit: 16 });
       if (opts.scrollCurrent) smoothScrollToItem($list, $list.querySelector('.mini-queue-item.now'), { duration: 0.30, align: 0.42 });
     });
-  }
+	}
 }
 document.addEventListener('click', function(e){
   if (miniQueueOpen && !(e.target && e.target.closest && e.target.closest('#bottom-bar'))) closeMiniQueue();
 });
+
+// ── 播放历史队列 ──
+var playHistory = [];
+function recordPlayHistory(song) {
+  if (!song || !song.name) return;
+  playHistory = playHistory.filter(function(s){ return s.id !== song.id || s.name !== song.name; });
+  playHistory.unshift(song);
+  if (playHistory.length > 50) playHistory.length = 50;
+}
+function renderPlayHistory() {
+  var $list = document.getElementById('mini-history-list');
+  if (!$list) return;
+  if (!playHistory.length) {
+    $list.innerHTML = '<div class="mini-queue-empty">暂无播放历史</div>';
+    return;
+  }
+  $list.innerHTML = playHistory.map(function(song, i){
+    var thumb = typeof songCoverSrc === 'function' ? songCoverSrc(song, 60) : '';
+    var imgTag = thumb ? '<img src="' + thumb + '" alt="" loading="lazy" onerror="this.style.opacity=0.2">' : '<div class="mini-queue-cover"></div>';
+    return '<div class="mini-queue-item" onclick="queueSong(playHistory[' + i + '],{position:\'end\'});playQueueAt(playQueue.length - 1)">' +
+      imgTag +
+      '<div class="mini-queue-info"><div class="mini-queue-name">' + escHtml(song.name) + '</div><div class="mini-queue-sub">' + escHtml(song.artist || '') + '</div></div>' +
+      '</div>';
+  }).join('');
+}
+
+// ── 队列/历史 tab 切换 ──
+function switchQueueTab(tab) {
+  var isQueue = tab === 'queue';
+  var qList = document.getElementById('mini-queue-list');
+  var hList = document.getElementById('mini-history-list');
+  if (qList) qList.style.display = isQueue ? '' : 'none';
+  if (hList) hList.style.display = isQueue ? 'none' : '';
+  if (!isQueue && playHistory.length) renderPlayHistory();
+  document.querySelectorAll('.mini-queue-tab').forEach(function(b){
+    b.classList.toggle('active', b.dataset.qt === tab);
+    b.style.background = b.dataset.qt === tab ? 'rgba(0,245,212,.12)' : 'transparent';
+    b.style.color = b.dataset.qt === tab ? '#fff' : 'rgba(255,255,255,.55)';
+  });
+}
 bindSmoothQueueScrolling();
 bindPlaylistPanelLazyRender();
 bindModalBackdropClose();
