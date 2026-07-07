@@ -1,12 +1,19 @@
 # Changelog
 
-## v1.1.1 (自维护起点)
+## v1.2.0 (社区维护版)
 
-- [#265] 修复安装器将网络驱动器误判为本地磁盘的问题（`MineradioHasPreferredInstallDrive` 改用 `GetDriveTypeA` 排除 `DRIVE_REMOTE`）
-- [#235] 修复视觉控制台导出按钮缺少玻璃质感样式的问题（补 `class="glass-saved-button"`）
-- 修复系统代理不可用时软件无法启动的问题（添加 `--proxy-bypass-list=<-loopback>` Chromium 开关，绕过代理访问本地服务）
+- 🎛️ 新增音效控制台：3段均衡器（低音/中音/高音）、8种音频预设、夜间模式
+- 📊 新增听歌报告：热门歌曲/歌手排名、播放统计、累计时长
+- 📑 新增发现页：热门歌曲、新歌推荐、12种音乐风格探索
+- 🎙️ 新增播客专区：精选播客推荐卡片，一键跳转详情
+- 📋 增强播放队列：队列/历史双视图、播放历史自动追踪
+- 🐛 修复安装器将网络驱动器误判为本地磁盘的问题
+- 🐛 修复导出按钮缺少玻璃质感样式的问题
+- 🐛 修复系统代理不可用时软件无法启动的问题
+- 🔧 清理原作者信息与个人链接
+- 📐 新增 `docs/CODEGRAPH.md` 代码图谱
 
-## v1.1.1 (upstream)
+## v1.1.1 (上游)
 
 - P0 installer safety fix: installation now defaults to the first available non-C drive from `D:\Mineradio` through `Z:\Mineradio`; it falls back to `C:\Mineradio` only when no D-Z drive exists.
 - The installer now forces the target path into a dedicated `Mineradio` folder, blocks non-empty non-Mineradio-owned targets, and blocks C drive installs when a D-Z drive is available.
