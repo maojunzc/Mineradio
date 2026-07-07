@@ -59,6 +59,8 @@ const HOST = process.env.HOST || '0.0.0.0';
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
 const COOKIE_FILE = process.env.COOKIE_FILE || path.join(__dirname, '.cookie');
 const QQ_COOKIE_FILE = process.env.QQ_COOKIE_FILE || path.join(__dirname, '.qq-cookie');
+const KUWO_COOKIE_FILE = path.join(__dirname, '.kuwo-cookie');
+const KUGOU_COOKIE_FILE = path.join(__dirname, '.kugou-cookie');
 const UPDATE_WORK_DIR = process.env.MINERADIO_UPDATE_DIR || path.join(__dirname, 'updates');
 const UPDATE_DOWNLOAD_DIR = process.env.MINERADIO_UPDATE_DOWNLOAD_DIR || path.join(UPDATE_WORK_DIR, 'downloads');
 const UPDATE_PATCH_BACKUP_DIR = process.env.MINERADIO_PATCH_BACKUP_DIR || path.join(UPDATE_WORK_DIR, 'backups', 'patches');
@@ -2947,9 +2949,16 @@ function mapKugouSong(item, hash) {
 
 let kuwoCookie = '';
 let kugouCookie = '';
+try { if (fs.existsSync(KUWO_COOKIE_FILE)) kuwoCookie = fs.readFileSync(KUWO_COOKIE_FILE, 'utf8').trim(); } catch (e) { kuwoCookie = ''; }
+try { if (fs.existsSync(KUGOU_COOKIE_FILE)) kugouCookie = fs.readFileSync(KUGOU_COOKIE_FILE, 'utf8').trim(); } catch (e) { kugouCookie = ''; }
 
 function saveKuwoCookie(c) {
   kuwoCookie = String(c || '').trim();
+  try { fs.writeFileSync(KUWO_COOKIE_FILE, kuwoCookie); } catch (e) {}
+}
+function saveKugouCookie(c) {
+  kugouCookie = String(c || '').trim();
+  try { fs.writeFileSync(KUGOU_COOKIE_FILE, kugouCookie); } catch (e) {}
 }
 
 async function handleKuwoSearch(keywords, limit) {
@@ -3642,7 +3651,7 @@ const server = http.createServer(async (req, res) => {
       const raw = body.cookie || body.data || body.text || '';
       const normalized = String(raw || '').trim();
       if (!normalized) { sendJSON(res, { provider: 'kugou', loggedIn: false, error: 'MISSING_COOKIE' }); return; }
-      kugouCookie = normalized;
+      saveKugouCookie(normalized);
       sendJSON(res, { provider: 'kugou', loggedIn: true, saved: true });
     } catch (err) {
       console.error('[KugouLoginCookie]', err);
@@ -3652,7 +3661,7 @@ const server = http.createServer(async (req, res) => {
   }
 
   if (pn === '/api/kugou/logout') {
-    kugouCookie = '';
+    saveKugouCookie('');
     sendJSON(res, { provider: 'kugou', ok: true, loggedIn: false });
     return;
   }
