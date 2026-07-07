@@ -363,6 +363,14 @@ body.empty-home-active.controls-visible #empty-home{bottom:128px}
 .genre-cloud{display:flex;flex-wrap:wrap;gap:8px;padding:4px 0}
 .genre-tag{padding:8px 20px;border:1px solid rgba(255,255,255,.08);border-radius:999px;background:rgba(255,255,255,.04);color:rgba(255,255,255,.60);font-size:13px;font-weight:500;cursor:pointer;transition:all .2s}
 .genre-tag:hover{background:rgba(0,245,212,.10);border-color:rgba(0,245,212,.30);color:#fff;transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,245,212,.08)}
+
+/* ── Discover Podcast ── */
+.podcast-card{display:flex;align-items:center;gap:12px;padding:10px;border-radius:14px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.03);cursor:pointer;transition:all .2s;margin-bottom:8px}
+.podcast-card:hover{background:rgba(255,255,255,.07);border-color:rgba(0,245,212,.20);transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,245,212,.06)}
+.podcast-cover{width:56px;height:56px;border-radius:12px;object-fit:cover;background:rgba(255,255,255,.08);flex-shrink:0}
+.podcast-info{flex:1;min-width:0}
+.podcast-name{font-size:13px;font-weight:600;color:rgba(255,255,255,.90);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.podcast-desc{font-size:11px;color:rgba(255,255,255,.42);margin-top:3px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .home-visual.generated{height:74px!important;max-width:300px!important;align-self:center!important}
 @media (max-height:760px){.home-visual.generated{height:64px!important;max-width:260px!important}}
 
@@ -2043,6 +2051,7 @@ html.control-glass-svg-ok #visual-guide-btn:hover{
         <button class="discover-tab active" data-discover-tab="hot" onclick="switchDiscoverTab('hot')">🔥 热门</button>
         <button class="discover-tab" data-discover-tab="new" onclick="switchDiscoverTab('new')">🎵 新歌</button>
         <button class="discover-tab" data-discover-tab="genre" onclick="switchDiscoverTab('genre')">🎸 风格</button>
+        <button class="discover-tab" data-discover-tab="podcast" onclick="switchDiscoverTab('podcast')">🎙️ 播客</button>
       </div>
     </div>
 
@@ -2067,6 +2076,9 @@ html.control-glass-svg-ok #visual-guide-btn:hover{
         <button class="genre-tag" onclick="searchGenre('日语')">日语</button>
         <button class="genre-tag" onclick="searchGenre('ACG')">ACG</button>
       </div>
+    </div>
+    <div id="discover-podcast" class="discover-section" style="display:none">
+      <!-- 由 JS 填充 -->
     </div>
   </div>
 </section>
@@ -16274,7 +16286,7 @@ function switchHomeTab(tab) {
 
 // ── Discover Tab 切换 ──
 function switchDiscoverTab(tab) {
-  ['hot','new','genre'].forEach(function(t){
+  ['hot','new','genre','podcast'].forEach(function(t){
     var el = document.getElementById('discover-' + t);
     if (el) el.style.display = t === tab ? '' : 'none';
   });
@@ -16283,6 +16295,7 @@ function switchDiscoverTab(tab) {
   });
   if (tab === 'hot' && !document.querySelector('#discover-hot').children.length) loadDiscoverHot();
   if (tab === 'new' && !document.querySelector('#discover-new').children.length) loadDiscoverNew();
+  if (tab === 'podcast' && !document.querySelector('#discover-podcast').children.length) loadDiscoverPodcast();
 }
 
 // ── 加载热门歌曲 ──
@@ -16340,6 +16353,44 @@ function discoverQueueSong(i) {
   if (!_discoverSongs || !_discoverSongs[i]) return;
   queueSong(_discoverSongs[i], { position: 'next' });
   showToast('已加入播放队列');
+}
+
+// ── 加载发现页播客 ──
+function loadDiscoverPodcast() {
+  var el = document.getElementById('discover-podcast');
+  if (!el) return;
+  el.innerHTML = '<div class="discover-empty">正在加载播客…</div>';
+  fetch('/api/podcast/hot?limit=12').then(function(r){ return r.json(); }).then(function(data){
+    if (!data || !data.podcasts || !data.podcasts.length) { el.innerHTML = '<div class="discover-empty">暂无播客推荐</div>'; return; }
+    el.innerHTML = data.podcasts.map(function(p, i){
+      var name = escHtml(p.name || '未命名播客');
+      var desc = escHtml((p.desc || p.description || '').slice(0, 60));
+      var img = p.picUrl || p.cover || p.coverUrl || '';
+      var imgHtml = img ? '<img class="podcast-cover" src="/api/cover?url=' + encodeURIComponent(img) + '" alt="" crossorigin loading="lazy">' : '<div class="podcast-cover"></div>';
+      var pid = p.id || p.rid || '';
+      return '<div class="podcast-card" onclick="openPodcastDetail(\'' + pid + '\')">' +
+        imgHtml +
+        '<div class="podcast-info"><div class="podcast-name">' + name + '</div><div class="podcast-desc">' + desc + '</div></div>' +
+        '</div>';
+    }).join('');
+  }).catch(function(){
+    el.innerHTML = '<div class="discover-empty">播客加载失败</div>';
+  });
+}
+
+// ── 播客详情入口 ──
+function openPodcastDetail(id) {
+  if (!id) return;
+  setSearchMode('podcast');
+  var input = document.getElementById('search-input');
+  if (input) { input.value = ''; input.focus(); }
+  fetch('/api/podcast/detail?id=' + id).then(function(r){ return r.json(); }).then(function(data){
+    if (data && data.podcast) {
+      renderPodcastRadios([data.podcast], data.podcast.name);
+    } else {
+      showToast('播客详情加载失败');
+    }
+  }).catch(function(){ showToast('播客详情加载失败'); });
 }
 
 // ── 快捷搜索风格 ──
