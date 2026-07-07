@@ -617,8 +617,14 @@ body.home-controls-locked #bottom-bar{opacity:0!important;pointer-events:none!im
 .volume-control.open::before,.volume-control:hover::before,.volume-control:focus-within::before,.quality-control.open::before,.quality-control:hover::before,.quality-control:focus-within::before{display:block}
 .volume-control.muted .ctrl-btn{color:rgba(255,255,255,.38)}
 .volume-popover{position:absolute;left:50%;bottom:46px;transform:translateX(-50%) translateY(8px);width:154px;height:42px;padding:0 12px;border-radius:14px;border:1px solid rgba(255,255,255,.09);background:rgba(12,12,16,.78);backdrop-filter:blur(24px) saturate(1.12);-webkit-backdrop-filter:blur(24px) saturate(1.12);box-shadow:0 18px 48px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.07);display:flex;align-items:center;gap:9px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:1}
-.volume-control .ctrl-btn,.quality-control .ctrl-btn{position:relative;z-index:2}
+.volume-control .ctrl-btn,.quality-control .ctrl-btn,.eq-btn-wrap .ctrl-btn{position:relative;z-index:2}
 .volume-control.open .volume-popover,.volume-control:hover .volume-popover,.volume-control:focus-within .volume-popover,.quality-control.open .quality-popover,.quality-control:hover .quality-popover,.quality-control:focus-within .quality-popover{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0)}
+.eq-popover.show{display:block!important}
+.eq-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.eq-label{font-size:10.5px;color:rgba(255,255,255,.55);flex-shrink:0}
+.eq-slider{flex:1;height:4px;-webkit-appearance:none;appearance:none;background:rgba(255,255,255,.12);border-radius:2px;outline:none;cursor:pointer}
+.eq-slider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#00f5d4;cursor:pointer;box-shadow:0 0 8px rgba(0,245,212,.24)}
+.eq-value{width:22px;text-align:right;font-size:10px;color:rgba(255,255,255,.42);font-variant-numeric:tabular-nums}
 #quality-btn.quality-pill{width:auto;min-width:56px;padding:0 11px;border-radius:13px;font-size:11px;font-weight:800;letter-spacing:.2px;color:rgba(237,245,255,.82);background:rgba(255,255,255,.038);box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
 #quality-btn-label{display:block;min-width:30px;text-align:center;white-space:nowrap}
 .quality-popover{position:absolute;left:50%;bottom:46px;transform:translateX(-50%) translateY(8px);width:228px;padding:8px;border-radius:14px;border:1px solid rgba(157,184,207,.24);background:rgba(10,11,14,.82);backdrop-filter:blur(24px) saturate(1.25);-webkit-backdrop-filter:blur(24px) saturate(1.25);box-shadow:0 18px 48px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.08);display:grid;grid-template-columns:1fr;gap:6px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:8}
@@ -2532,6 +2538,26 @@ html.control-glass-svg-ok #visual-guide-btn:hover{
           <button class="quality-option" data-quality="standard" onclick="setPlaybackQuality('standard')"><span>标准</span><small>128kbps</small></button>
         </div>
       </div>
+      <div id="eq-control" class="volume-control" style="position:relative;display:flex;align-items:center">
+        <button id="eq-btn" class="ctrl-btn" onclick="toggleEqPanel(event)" title="音效均衡器" style="font-size:12px;font-weight:700">🎛️</button>
+        <div class="eq-popover" onclick="event.stopPropagation()" style="display:none;position:absolute;left:50%;bottom:46px;transform:translateX(-50%);width:200px;padding:14px;border-radius:14px;border:1px solid rgba(255,255,255,.09);background:rgba(12,12,16,.82);backdrop-filter:blur(24px) saturate(1.12);-webkit-backdrop-filter:blur(24px) saturate(1.12);box-shadow:0 18px 48px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.07);z-index:9">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+            <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.85)">音效均衡器</div>
+            <div style="display:flex;gap:4px">
+              <button class="fx-mini-btn ghost" onclick="cycleAudioPreset()" style="height:24px;padding:0 8px;font-size:10px" title="切换预设">预设</button>
+              <button class="fx-mini-btn ghost" onclick="resetAudioEQ()" style="height:24px;padding:0 8px;font-size:10px" title="重置">重置</button>
+            </div>
+          </div>
+          <div id="eq-preset-label" style="font-size:10px;color:rgba(255,255,255,.40);text-align:center;margin-bottom:8px">预设: off</div>
+          <div class="eq-row"><label class="eq-label" style="width:40px">低音</label><input type="range" class="eq-slider" data-band="bass" min="-12" max="12" value="0" oninput="setAudioEQ('bass',this.value)"><span class="eq-value" id="eq-val-bass">0</span></div>
+          <div class="eq-row"><label class="eq-label" style="width:40px">中音</label><input type="range" class="eq-slider" data-band="mid" min="-12" max="12" value="0" oninput="setAudioEQ('mid',this.value)"><span class="eq-value" id="eq-val-mid">0</span></div>
+          <div class="eq-row"><label class="eq-label" style="width:40px">高音</label><input type="range" class="eq-slider" data-band="treble" min="-12" max="12" value="0" oninput="setAudioEQ('treble',this.value)"><span class="eq-value" id="eq-val-treble">0</span></div>
+          <div class="eq-row" style="margin-top:6px;justify-content:space-between">
+            <label style="font-size:10.5px;color:rgba(255,255,255,.55)">🌙 夜间模式</label>
+            <button id="eq-night-btn" class="fx-mini-btn ghost" onclick="toggleAudioNightMode()" style="height:22px;padding:0 10px;font-size:10px;border-radius:999px">关闭</button>
+          </div>
+        </div>
+      </div>
       <button id="heart-btn" class="ctrl-btn" onclick="toggleLikeCurrent()" title="红心喜欢"><svg class="heart-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.45c-.32 0-.62-.12-.86-.34l-1.23-1.12C5.54 16.03 2.25 13.05 2.25 8.9 2.25 5.48 4.88 2.9 8.28 2.9c1.7 0 3.35.72 4.52 1.96C13.97 3.62 15.62 2.9 17.32 2.9c3.4 0 6.03 2.58 6.03 6 0 4.15-3.29 7.13-7.66 11.09l-1.23 1.12c-.24.22-.54.34-.86.34z"/></svg></button>
       <button id="collect-btn" class="ctrl-btn" onclick="openCollectModalForCurrent()" title="收藏到歌单"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M5 12h14"/></svg></button>
     </div>
@@ -2780,6 +2806,7 @@ html.control-glass-svg-ok #visual-guide-btn:hover{
 //  Global State
 // ============================================================
 var audio = null, audioCtx = null, source = null, analyser = null, beatAnalyser = null, gainNode = null, audioReady = false;
+var _eqNodes = null; // EQ filter nodes: _{ bass, mid, treble }
 var uiSfxCtx = null, lastShelfSelectSfxAt = 0;
 var FFT_SIZE = 2048;
 var frequencyData = new Uint8Array(FFT_SIZE / 2);
@@ -3370,6 +3397,12 @@ var fxDefaults = {
   performanceQuality: 'high',
   liveBackgroundKeep: false,
   cam: 'off',
+  // 音效控制
+  audioBass: 0,
+  audioMid: 0,
+  audioTreble: 0,
+  audioNightMode: false,
+  audioPreset: 'off',
 };
 var PACKAGED_DEFAULT_USER_FX_ARCHIVE_NAME = '默认测试';
 var PACKAGED_DEFAULT_USER_FX_ARCHIVE_EXPORTED_AT = 1782276031784;
@@ -18015,7 +18048,25 @@ function initAudio() {
   beatAnalyser.smoothingTimeConstant = 0.10;
   source.connect(analyser);
   source.connect(beatAnalyser);
-  analyser.connect(gainNode);
+  // 音效处理链: analyser → eqBass → eqMid → eqTreble → gainNode → destination
+  var eqBass = audioCtx.createBiquadFilter();
+  eqBass.type = 'lowshelf';
+  eqBass.frequency.value = 250;
+  eqBass.gain.value = fx && fx.audioBass != null ? fx.audioBass : 0;
+  var eqMid = audioCtx.createBiquadFilter();
+  eqMid.type = 'peaking';
+  eqMid.frequency.value = 1000;
+  eqMid.Q.value = 1.0;
+  eqMid.gain.value = fx && fx.audioMid != null ? fx.audioMid : 0;
+  var eqTreble = audioCtx.createBiquadFilter();
+  eqTreble.type = 'highshelf';
+  eqTreble.frequency.value = 4000;
+  eqTreble.gain.value = fx && fx.audioTreble != null ? fx.audioTreble : 0;
+  _eqNodes = { bass: eqBass, mid: eqMid, treble: eqTreble };
+  analyser.connect(eqBass);
+  eqBass.connect(eqMid);
+  eqMid.connect(eqTreble);
+  eqTreble.connect(gainNode);
   gainNode.connect(audioCtx.destination);
   applyVolumeToAudio();
   frequencyData.fill(0);
@@ -18275,6 +18326,100 @@ function toggleVolumePanel(e) {
 
 function toggleMute() {
   setVolume(targetVolume > 0.01 ? 0 : (lastNonZeroVolume || 0.8));
+}
+
+// ── 音效控制 ──
+function setAudioEQ(band, value) {
+  if (!fx) return;
+  var key = band === 'bass' ? 'audioBass' : (band === 'mid' ? 'audioMid' : 'audioTreble');
+  fx[key] = clampRange(Number(value) || 0, -12, 12);
+  if (_eqNodes && _eqNodes[band]) {
+    _eqNodes[band].gain.setTargetAtTime(fx[key], audioCtx.currentTime, 0.05);
+  }
+  saveLyricLayout();
+  if (typeof updateAudioEqUi === 'function') updateAudioEqUi();
+}
+
+function resetAudioEQ() {
+  ['bass','mid','treble'].forEach(function(band){
+    setAudioEQ(band, 0);
+  });
+  fx.audioNightMode = false;
+  fx.audioPreset = 'off';
+  if (typeof updateAudioEqUi === 'function') updateAudioEqUi();
+  showToast('音效已重置');
+}
+
+function applyAudioPreset(name) {
+  var presets = {
+    'off': { bass: 0, mid: 0, treble: 0, night: false },
+    'pop': { bass: 3, mid: 4, treble: 5, night: false },
+    'rock': { bass: 6, mid: 2, treble: 3, night: false },
+    'classical': { bass: 2, mid: 1, treble: 3, night: false },
+    'jazz': { bass: 4, mid: 3, treble: 2, night: false },
+    'electronic': { bass: 5, mid: -1, treble: 6, night: false },
+    'voice': { bass: -2, mid: 5, treble: 3, night: false },
+    'night': { bass: 0, mid: -2, treble: -3, night: true },
+  };
+  var p = presets[name] || presets['off'];
+  setAudioEQ('bass', p.bass);
+  setAudioEQ('mid', p.mid);
+  setAudioEQ('treble', p.treble);
+  fx.audioNightMode = !!p.night;
+  fx.audioPreset = name;
+  saveLyricLayout();
+  if (typeof updateAudioEqUi === 'function') updateAudioEqUi();
+  showToast('音效预设: ' + name);
+}
+
+function cycleAudioPreset() {
+  var list = ['off','pop','rock','classical','jazz','electronic','voice','night'];
+  var idx = list.indexOf(fx && fx.audioPreset || 'off');
+  applyAudioPreset(list[(idx + 1) % list.length]);
+}
+
+function toggleAudioNightMode() {
+  if (!fx) return;
+  fx.audioNightMode = !fx.audioNightMode;
+  saveLyricLayout();
+  if (typeof updateAudioEqUi === 'function') updateAudioEqUi();
+  showToast(fx.audioNightMode ? '夜间模式: 压缩动态范围' : '夜间模式: 关闭');
+}
+
+var _eqPanelOpen = false;
+function toggleEqPanel(e) {
+  if (e) e.stopPropagation();
+  _eqPanelOpen = !_eqPanelOpen;
+  var pop = document.querySelector('.eq-popover');
+  if (pop) pop.classList.toggle('show', _eqPanelOpen);
+  if (_eqPanelOpen && typeof updateAudioEqUi === 'function') updateAudioEqUi();
+}
+document.addEventListener('click', function(e){
+  if (_eqPanelOpen && !(e.target && e.target.closest && e.target.closest('#eq-control'))) {
+    _eqPanelOpen = false;
+    var pop = document.querySelector('.eq-popover');
+    if (pop) pop.classList.remove('show');
+  }
+});
+
+function updateAudioEqUi() {
+  if (!fx) return;
+  ['bass','mid','treble'].forEach(function(band){
+    var key = 'audio' + band.charAt(0).toUpperCase() + band.slice(1);
+    var val = fx[key] != null ? fx[key] : 0;
+    var slider = document.querySelector('.eq-slider[data-band="' + band + '"]');
+    var valEl = document.getElementById('eq-val-' + band);
+    if (slider) slider.value = val;
+    if (valEl) valEl.textContent = val > 0 ? '+' + val : val;
+  });
+  var nightBtn = document.getElementById('eq-night-btn');
+  if (nightBtn) {
+    nightBtn.textContent = fx.audioNightMode ? '开启' : '关闭';
+    nightBtn.style.background = fx.audioNightMode ? 'rgba(0,245,212,.15)' : '';
+    nightBtn.style.color = fx.audioNightMode ? '#fff' : '';
+  }
+  var presetLabel = document.getElementById('eq-preset-label');
+  if (presetLabel) presetLabel.textContent = '预设: ' + (fx.audioPreset || 'off');
 }
 
 function bindVolumeControls() {
