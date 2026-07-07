@@ -4,6 +4,7 @@
 
 - [#265] 修复安装器将网络驱动器误判为本地磁盘的问题（`MineradioHasPreferredInstallDrive` 改用 `GetDriveTypeA` 排除 `DRIVE_REMOTE`）
 - [#235] 修复视觉控制台导出按钮缺少玻璃质感样式的问题（补 `class="glass-saved-button"`）
+- 修复系统代理不可用时软件无法启动的问题（添加 `--proxy-bypass-list=<-loopback>` Chromium 开关，绕过代理访问本地服务）
 
 ## v1.1.1 (upstream)
 
