@@ -16587,17 +16587,79 @@ async function playHomeRecent(record) {
   await playQueueAt(0);
 }
 function openHomeInsight() {
-  var summary = homeListenSummary();
-  if (summary.topArtist && summary.topArtist.name) {
-    runHomeSearch(summary.topArtist.name);
-    return;
-  }
-  if (summary.topSong && summary.topSong.name) {
-    runHomeSearch(summary.topSong.name);
-    return;
-  }
-  showToast('播放几首歌后会生成听歌画像');
+  // 升级为听歌报告
+  showListeningReport();
 }
+
+function showListeningReport() {
+  var summary = homeListenSummary();
+  var existing = document.getElementById('listen-report-modal');
+  if (existing) { existing.remove(); }
+
+  var totalPlays = 0, totalMs = 0;
+  var songs = Object.keys(listenStatsState.songs || {}).map(function(k){
+    var s = listenStatsState.songs[k];
+    totalPlays += s.plays || 0;
+    totalMs += s.listenMs || 0;
+    return s;
+  }).sort(function(a,b){ return (b.listenMs||0) - (a.listenMs||0); });
+
+  var artists = Object.keys(listenStatsState.artists || {}).map(function(k){ return listenStatsState.artists[k]; })
+    .sort(function(a,b){ return (b.listenMs||0) - (a.listenMs||0); });
+
+  var recent = (listenStatsState.history || []).slice(0, 10);
+
+  var modal = document.createElement('div');
+  modal.id = 'listen-report-modal';
+  modal.className = 'modal';
+  modal.style.cssText = 'position:fixed;z-index:100;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;padding:24px;animation:fadeIn .25s';
+  modal.onclick = function(e){ if (e.target === modal) modal.remove(); };
+
+  function fmtMs(ms) {
+    if (!ms || ms < 60000) return '<1分钟';
+    var m = Math.round(ms / 60000);
+    if (m < 60) return m + '分钟';
+    var h = Math.floor(m / 60);
+    m = m % 60;
+    return h + '小时' + (m ? m + '分钟' : '');
+  }
+
+  var topSongsHtml = songs.slice(0, 5).map(function(s, i){
+    return '<div class="ir-item"><span class="ir-rank">' + (i+1) + '</span><div class="ir-info"><div class="ir-name">' + escHtml(s.name) + '</div><div class="ir-sub">' + escHtml(s.artist || '') + '</div></div><div class="ir-stat">' + s.plays + '次 · ' + fmtMs(s.listenMs) + '</div></div>';
+  }).join('');
+
+  var topArtistsHtml = artists.slice(0, 5).map(function(a, i){
+    return '<div class="ir-item"><span class="ir-rank">' + (i+1) + '</span><div class="ir-info"><div class="ir-name">' + escHtml(a.name) + '</div></div><div class="ir-stat">' + a.plays + '次 · ' + fmtMs(a.listenMs) + '</div></div>';
+  }).join('');
+
+  var recentHtml = recent.map(function(r){
+    return '<div class="ir-item" onclick="if(window.playQueueAt&&typeof playQueueAt===\'function\'){queueSong(listenStatsState.history.find(function(h){return h.key===\'' + escHtml(r.key||'') + '\'})||{name:\'' + escHtml(r.name||'') + '\',artist:\'' + escHtml(r.artist||'') + '\'},{position:\'end\'});playQueueAt(playQueue.length-1);}modal.remove()" style="cursor:pointer"><div class="ir-info"><div class="ir-name">' + escHtml(r.name||'') + '</div><div class="ir-sub">' + escHtml(r.artist||'') + '</div></div><div class="ir-stat">' + fmtMs(r.listenMs) + '</div></div>';
+  }).join('') || '<div class="ir-empty">暂无播放记录</div>';
+
+  var totalTime = fmtMs(totalMs);
+
+  modal.innerHTML =
+    '<div class="ir-wrap" onclick="event.stopPropagation()" style="background:rgba(10,12,16,.92);border:1px solid rgba(255,255,255,.07);border-radius:20px;padding:24px;width:min(520px,100vw-48px);max-height:80vh;overflow-y:auto;box-shadow:0 32px 96px rgba(0,0,0,.5)">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">' +
+        '<div><div style="font-size:18px;font-weight:700;color:#fff">📊 听歌报告</div>' +
+        '<div style="font-size:11px;color:rgba(255,255,255,.40);margin-top:4px">共 ' + totalPlays + ' 次播放 · 累计 ' + totalTime + '</div></div>' +
+        '<button onclick="this.closest(\'.modal\').remove()" style="width:30px;height:30px;border:none;border-radius:8px;background:rgba(255,255,255,.06);color:rgba(255,255,255,.6);font-size:16px;cursor:pointer">×</button>' +
+      '</div>' +
+      '<div class="ir-section"><div class="ir-section-title">🎵 热门歌曲</div>' + (topSongsHtml || '<div class="ir-empty">暂无数据</div>') + '</div>' +
+      '<div class="ir-section" style="margin-top:14px"><div class="ir-section-title">🎤 热门歌手</div>' + (topArtistsHtml || '<div class="ir-empty">暂无数据</div>') + '</div>' +
+      '<div class="ir-section" style="margin-top:14px"><div class="ir-section-title">🕐 最近播放</div>' + recentHtml + '</div>' +
+      '<div style="margin-top:16px;padding-top:12px;border-top:1px solid rgba(255,255,255,.06);text-align:center;font-size:10.5px;color:rgba(255,255,255,.28)">数据保存在本地，仅统计登录后的播放</div>' +
+    '</div>';
+
+  document.body.appendChild(modal);
+}
+
+// 注入 CSS
+(function(){ if (document.getElementById('ir-style')) return;
+  var s = document.createElement('style'); s.id = 'ir-style';
+  s.textContent = '.ir-section{margin-bottom:4px}.ir-section-title{font-size:12px;font-weight:700;color:rgba(255,255,255,.7);margin-bottom:6px;letter-spacing:.3px}.ir-item{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:10px;transition:background .15s}.ir-item:hover{background:rgba(255,255,255,.04)}.ir-rank{width:18px;text-align:center;font-size:11px;font-weight:700;color:rgba(255,255,255,.3);flex-shrink:0}.ir-info{flex:1;min-width:0}.ir-name{font-size:12px;color:rgba(255,255,255,.88);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ir-sub{font-size:10.5px;color:rgba(255,255,255,.38);margin-top:1px}.ir-stat{font-size:10.5px;color:rgba(255,255,255,.35);white-space:nowrap;flex-shrink:0}.ir-empty{padding:16px;text-align:center;color:rgba(255,255,255,.3);font-size:12px}';
+  document.head.appendChild(s);
+})();
 async function playWeatherSong(index) {
   var radio = homeWeatherRadioState.radio;
   var songs = radio && radio.songs || [];
