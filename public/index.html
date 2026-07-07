@@ -330,6 +330,39 @@ body.empty-home-active .home-visual{animation:home-visual-drift 8.8s ease-in-out
 body.empty-home-active.controls-visible #empty-home{bottom:128px}
 @media (max-height:760px){body.empty-home-active.controls-visible #empty-home{bottom:112px}}
 @media (max-width:620px){#empty-home{top:146px;bottom:44px;width:calc(100vw - 24px)}.home-hero{padding:20px;border-radius:22px}.home-hero-inner{display:flex;flex-direction:column}.home-visual{display:none}.home-mosaic{display:none}.home-grid{grid-template-columns:1fr}.home-tile-row{grid-template-columns:repeat(2,minmax(0,1fr))}.home-tile-cover{height:auto;aspect-ratio:1}.home-tile-sub{display:block}.home-card-art{width:88px;height:88px}.home-card-title,.home-card-sub{max-width:68%}}
+
+/* ── Home Tab Bar ── */
+.home-tab-bar{display:flex;gap:4px;margin-bottom:14px;padding:0 2px}
+.home-tab{padding:6px 18px;border:1px solid rgba(255,255,255,.08);border-radius:999px;background:rgba(255,255,255,.04);color:rgba(255,255,255,.55);font-size:12.5px;font-weight:600;cursor:pointer;transition:all .18s}
+.home-tab:hover{background:rgba(255,255,255,.08);color:rgba(255,255,255,.84)}
+.home-tab.active{background:rgba(0,245,212,.12);border-color:rgba(0,245,212,.34);color:#fff}
+
+/* ── Discover Page ── */
+.discover-page{height:100%;overflow-y:auto;padding-right:6px}
+.discover-page::-webkit-scrollbar{width:3px}
+.discover-page::-webkit-scrollbar-thumb{background:rgba(255,255,255,.20);border-radius:3px}
+.discover-hero{margin-bottom:16px}
+.discover-tabs{display:flex;gap:6px;flex-wrap:wrap}
+.discover-tab{padding:7px 18px;border:1px solid rgba(255,255,255,.08);border-radius:999px;background:rgba(255,255,255,.04);color:rgba(255,255,255,.55);font-size:13px;font-weight:600;cursor:pointer;transition:all .18s}
+.discover-tab:hover{background:rgba(255,255,255,.08);color:rgba(255,255,255,.84)}
+.discover-tab.active{background:rgba(0,245,212,.12);border-color:rgba(0,245,212,.34);color:#fff}
+.discover-section{animation:discFadeIn .32s ease-out}
+@keyframes discFadeIn{0%{opacity:0;transform:translateY(8px)}100%{opacity:1;transform:translateY(0)}}
+.discover-list{display:flex;flex-direction:column;gap:6px}
+.discover-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.03);cursor:pointer;transition:all .18s}
+.discover-item:hover{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.12)}
+.discover-item-cover{width:40px;height:40px;border-radius:8px;object-fit:cover;background:rgba(255,255,255,.08);flex-shrink:0}
+.discover-item-info{flex:1;min-width:0}
+.discover-item-name{font-size:12.5px;color:rgba(255,255,255,.90);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.discover-item-artist{font-size:11px;color:rgba(255,255,255,.42);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.discover-item-add{width:28px;height:28px;border:none;border-radius:8px;background:rgba(255,255,255,.06);color:rgba(255,255,255,.50);cursor:pointer;font-size:16px;line-height:1;transition:all .15s;flex-shrink:0}
+.discover-item-add:hover{background:rgba(0,245,212,.16);color:#fff}
+.discover-empty{padding:40px 16px;text-align:center;color:rgba(255,255,255,.30);font-size:13px}
+
+/* ── Genre Cloud ── */
+.genre-cloud{display:flex;flex-wrap:wrap;gap:8px;padding:4px 0}
+.genre-tag{padding:8px 20px;border:1px solid rgba(255,255,255,.08);border-radius:999px;background:rgba(255,255,255,.04);color:rgba(255,255,255,.60);font-size:13px;font-weight:500;cursor:pointer;transition:all .2s}
+.genre-tag:hover{background:rgba(0,245,212,.10);border-color:rgba(0,245,212,.30);color:#fff;transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,245,212,.08)}
 .home-visual.generated{height:74px!important;max-width:300px!important;align-self:center!important}
 @media (max-height:760px){.home-visual.generated{height:64px!important;max-width:260px!important}}
 
@@ -1929,11 +1962,29 @@ html.control-glass-svg-ok #visual-guide-btn:hover{
 
 <!-- 空场 Home -->
 <section id="empty-home" aria-label="Mineradio home">
+  <div class="home-tab-bar">
+    <button class="home-tab active" data-home-tab="home" onclick="switchHomeTab('home')">首页</button>
+    <button class="home-tab" data-home-tab="discover" onclick="switchHomeTab('discover')">发现</button>
+  </div>
   <div class="empty-home-shell">
     <div class="home-hero">
-      <div class="home-hero-inner home-construction-inner">
-        <div class="home-title home-construction-title">🚧此处施工，敬请期待🚧</div>
-        <button class="home-chip home-console-chip" type="button" onclick="openHomePlayerConsole()">展开播放器控制台</button>
+      <div class="home-hero-inner">
+        <div class="home-title">现在听什么？</div>
+        <div class="home-sub" id="home-hero-sub">感受天气电台带来的音乐氛围</div>
+        <div class="home-quick-row">
+          <button class="home-chip" type="button" onclick="toggleMiniQueue(event)" title="当前队列">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="margin-right:6px"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg>
+            队列
+          </button>
+          <button class="home-chip" type="button" onclick="triggerWeatherRadio()" id="home-weather-chip">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="margin-right:6px"><path d="M18 10a6 6 0 00-12 0"/><path d="M6 16a4 4 0 008 0"/><circle cx="12" cy="16" r="2"/></svg>
+            天气电台
+          </button>
+          <button class="home-chip" type="button" onclick="document.getElementById('search-input').focus(); showSearch()" title="搜索">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="margin-right:6px"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            搜索
+          </button>
+        </div>
       </div>
     </div>
 
@@ -1982,6 +2033,40 @@ html.control-glass-svg-ok #visual-guide-btn:hover{
         <div class="home-section-note" id="home-rail-note">正在整理推荐</div>
       </div>
       <div id="home-tile-row" class="home-tile-row"></div>
+    </div>
+  </div>
+
+  <!-- 发现页 -->
+  <div id="discover-page" class="discover-page" style="display:none">
+    <div class="discover-hero">
+      <div class="discover-tabs" role="tablist">
+        <button class="discover-tab active" data-discover-tab="hot" onclick="switchDiscoverTab('hot')">🔥 热门</button>
+        <button class="discover-tab" data-discover-tab="new" onclick="switchDiscoverTab('new')">🎵 新歌</button>
+        <button class="discover-tab" data-discover-tab="genre" onclick="switchDiscoverTab('genre')">🎸 风格</button>
+      </div>
+    </div>
+
+    <div id="discover-hot" class="discover-section">
+      <!-- 由 JS 填充 -->
+    </div>
+    <div id="discover-new" class="discover-section" style="display:none">
+      <!-- 由 JS 填充 -->
+    </div>
+    <div id="discover-genre" class="discover-section" style="display:none">
+      <div class="genre-cloud">
+        <button class="genre-tag" onclick="searchGenre('流行')">流行</button>
+        <button class="genre-tag" onclick="searchGenre('摇滚')">摇滚</button>
+        <button class="genre-tag" onclick="searchGenre('电子')">电子</button>
+        <button class="genre-tag" onclick="searchGenre('嘻哈')">嘻哈</button>
+        <button class="genre-tag" onclick="searchGenre('R&B')">R&amp;B</button>
+        <button class="genre-tag" onclick="searchGenre('爵士')">爵士</button>
+        <button class="genre-tag" onclick="searchGenre('古典')">古典</button>
+        <button class="genre-tag" onclick="searchGenre('民谣')">民谣</button>
+        <button class="genre-tag" onclick="searchGenre('金属')">金属</button>
+        <button class="genre-tag" onclick="searchGenre('古风')">古风</button>
+        <button class="genre-tag" onclick="searchGenre('日语')">日语</button>
+        <button class="genre-tag" onclick="searchGenre('ACG')">ACG</button>
+      </div>
     </div>
   </div>
 </section>
@@ -16169,6 +16254,139 @@ function dismissHomePage(opts) {
   updateEmptyHomeVisibility({ forceLoad: false });
   setPeek(document.getElementById('search-area'), false, 'search');
   if (typeof setFocusZone === 'function') setFocusZone(null, true);
+}
+
+// ── Home Tab 切换 ──
+function switchHomeTab(tab) {
+  var isHome = tab === 'home';
+  var shell = document.querySelector('.empty-home-shell');
+  var disc = document.getElementById('discover-page');
+  if (!shell || !disc) return;
+  shell.style.display = isHome ? '' : 'none';
+  disc.style.display = isHome ? 'none' : '';
+  document.querySelectorAll('.home-tab').forEach(function(b){
+    b.classList.toggle('active', b.dataset.homeTab === tab);
+  });
+  if (!isHome && !document.querySelector('#discover-hot').children.length) {
+    loadDiscoverHot();
+  }
+}
+
+// ── Discover Tab 切换 ──
+function switchDiscoverTab(tab) {
+  ['hot','new','genre'].forEach(function(t){
+    var el = document.getElementById('discover-' + t);
+    if (el) el.style.display = t === tab ? '' : 'none';
+  });
+  document.querySelectorAll('.discover-tab').forEach(function(b){
+    b.classList.toggle('active', b.dataset.discoverTab === tab);
+  });
+  if (tab === 'hot' && !document.querySelector('#discover-hot').children.length) loadDiscoverHot();
+  if (tab === 'new' && !document.querySelector('#discover-new').children.length) loadDiscoverNew();
+}
+
+// ── 加载热门歌曲 ──
+function loadDiscoverHot() {
+  var el = document.getElementById('discover-hot');
+  if (!el) return;
+  el.innerHTML = '<div class="discover-empty">正在加载热门歌曲…</div>';
+  fetch('/api/search?keywords=热歌&limit=20').then(function(r){ return r.json(); }).then(function(data){
+    if (!data || !data.songs || !data.songs.length) { el.innerHTML = '<div class="discover-empty">暂无数据</div>'; return; }
+    cacheDiscoverSongs(data.songs);
+    el.innerHTML = '<div class="discover-list">' + renderDiscoverItems(data.songs) + '</div>';
+  }).catch(function(){
+    el.innerHTML = '<div class="discover-empty">加载失败</div>';
+  });
+}
+
+// ── 加载新歌 ──
+function loadDiscoverNew() {
+  var el = document.getElementById('discover-new');
+  if (!el) return;
+  el.innerHTML = '<div class="discover-empty">正在加载新歌…</div>';
+  fetch('/api/search?keywords=新歌&limit=20').then(function(r){ return r.json(); }).then(function(data){
+    if (!data || !data.songs || !data.songs.length) { el.innerHTML = '<div class="discover-empty">暂无数据</div>'; return; }
+    el.innerHTML = '<div class="discover-list">' + renderDiscoverItems(data.songs) + '</div>';
+  }).catch(function(){
+    el.innerHTML = '<div class="discover-empty">加载失败</div>';
+  });
+}
+
+function renderDiscoverItems(songs) {
+  return songs.map(function(s,i){
+    var name = escHtml(s.name || '未知歌曲');
+    var artist = s.artists ? s.artists.map(function(a){ return escHtml(a.name || ''); }).join(' / ') : (s.artist || '');
+    var img = s.album && s.album.picUrl ? s.album.picUrl : (s.cover || '');
+    var imgHtml = img ? '<img class="discover-item-cover" src="/api/cover?url=' + encodeURIComponent(img) + '" alt="" crossorigin loading="lazy">' : '<div class="discover-item-cover"></div>';
+    var sid = s.id || s.sid || '';
+    return '<div class="discover-item" onclick="discoverPlaySong(' + i + ',event)" data-index="' + i + '">' +
+      '<span style="width:20px;text-align:center;font-size:12px;font-weight:700;color:rgba(255,255,255,.35)">' + (i+1) + '</span>' +
+      imgHtml +
+      '<div class="discover-item-info"><div class="discover-item-name">' + name + '</div><div class="discover-item-artist">' + artist + '</div></div>' +
+      '<button class="discover-item-add" onclick="event.stopPropagation();discoverQueueSong(' + i + ')" title="下一首播放">+</button>' +
+      '</div>';
+  }).join('');
+}
+
+// ── 发现页点击播放（从缓存 songs 中取） ──
+var _discoverSongs = null;
+function cacheDiscoverSongs(songs) { _discoverSongs = songs; }
+function discoverPlaySong(i, e) {
+  if (!_discoverSongs || !_discoverSongs[i]) return;
+  queueSong(_discoverSongs[i], { position: 'end' });
+  playQueueAt(playQueue.length - 1);
+}
+function discoverQueueSong(i) {
+  if (!_discoverSongs || !_discoverSongs[i]) return;
+  queueSong(_discoverSongs[i], { position: 'next' });
+  showToast('已加入播放队列');
+}
+
+// ── 快捷搜索风格 ──
+function searchGenre(genre) {
+  var input = document.getElementById('search-input');
+  if (input) {
+    input.value = genre;
+    input.focus();
+    setSearchMode('song');
+    if (typeof handleSearch === 'function') handleSearch();
+  }
+}
+
+// ── 触发天气电台 ──
+function triggerWeatherRadio() {
+  var weatherChip = document.getElementById('home-weather-chip');
+  if (weatherChip) { weatherChip.textContent = '☁️ 获取天气中…'; weatherChip.disabled = true; }
+  fetch('/api/weather/ip-location').then(function(r){ return r.json(); }).then(function(data){
+    var loc = data && data.location;
+    if (loc && loc.city && loc.lat && loc.lon) {
+      return fetch('/api/weather/radio?city=' + encodeURIComponent(loc.city) + '&lat=' + loc.lat + '&lon=' + loc.lon + '&timezone=' + encodeURIComponent(loc.timezone || ''));
+    }
+    return fetch('/api/weather/radio?city=北京&lat=39.9&lon=116.4&timezone=Asia/Shanghai');
+  }).then(function(r){ return r.json(); }).then(function(data){
+    if (weatherChip) { weatherChip.textContent = '☁️ 天气电台'; weatherChip.disabled = false; }
+    if (data && data.radio && data.radio.songs && data.radio.songs.length) {
+      if (typeof playQueue === 'function') {
+        playQueue(data.radio.songs, 0, { mode: 'weather' });
+      }
+    } else {
+      showToast('天气电台暂无结果');
+    }
+  }).catch(function(){
+    if (weatherChip) { weatherChip.textContent = '☁️ 天气电台'; weatherChip.disabled = false; }
+    showToast('天气电台加载失败');
+  });
+}
+
+// ── 显示搜索框 ──
+function showSearch() {
+  var area = document.getElementById('search-area');
+  if (area) {
+    area.classList.add('peek');
+    area.classList.add('has-results');
+  }
+  var input = document.getElementById('search-input');
+  if (input) input.focus();
 }
 function isPointInsideRectWithPad(x, y, rect, pad) {
   if (!rect || rect.width <= 0 || rect.height <= 0) return false;
