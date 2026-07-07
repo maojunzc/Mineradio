@@ -21,7 +21,7 @@ try {
 html,body{font-family:var(--font-sans);background:#000;color:#fff;overflow:hidden;height:100vh;width:100vw;user-select:none;-webkit-font-smoothing:antialiased}
 body.cursor-hidden,body.cursor-hidden *{cursor:none!important}
 html.desktop-shell-root,html.desktop-shell-root body{background:transparent}
-:root{--font-sans:"Noto Sans SC","PingFang SC","HarmonyOS Sans SC","Alibaba PuHuiTi","Inter",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;--font-mono:"JetBrains Mono","Geist Mono","SF Mono",ui-monospace,monospace;--fc-bg:#08090B;--fc-paper:#0E1014;--fc-ink:#E8ECEF;--fc-ink-2:#D2D7DC;--fc-muted:#8A9099;--fc-hair:#1A1D22;--fc-hair-2:#262A31;--fc-accent:#00F5D4;--fc-accent-hov:#00E0BE;--fc-accent-rgb:0,245,212;--fc-blue:#2442ff;--fc-warm:#f8f4ee;--chill-ink:#030608;--chill-deep:#061116;--chill-cyan:#8fe9ff;--chill-blue:#73a7ff;--chill-mint:#9cffdf;--chill-soft:rgba(214,248,255,.9);--champagne:#f4d28a;--champagne-deep:#9a6f2c;--home-accent:#00f5d4;--home-accent-rgb:0,245,212;--visual-tint:#9db8cf;--source-netease:#d95b67;--source-qq:#00F5D4;--source-local:#9db8cf}
+:root{--font-sans:"Noto Sans SC","PingFang SC","HarmonyOS Sans SC","Alibaba PuHuiTi","Inter",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;--font-mono:"JetBrains Mono","Geist Mono","SF Mono",ui-monospace,monospace;--fc-bg:#08090B;--fc-paper:#0E1014;--fc-ink:#E8ECEF;--fc-ink-2:#D2D7DC;--fc-muted:#8A9099;--fc-hair:#1A1D22;--fc-hair-2:#262A31;--fc-accent:#00F5D4;--fc-accent-hov:#00E0BE;--fc-accent-rgb:0,245,212;--fc-blue:#2442ff;--fc-warm:#f8f4ee;--chill-ink:#030608;--chill-deep:#061116;--chill-cyan:#8fe9ff;--chill-blue:#73a7ff;--chill-mint:#9cffdf;--chill-soft:rgba(214,248,255,.9);--champagne:#f4d28a;--champagne-deep:#9a6f2c;--home-accent:#00f5d4;--home-accent-rgb:0,245,212;--visual-tint:#9db8cf;--source-netease:#d95b67;--source-qq:#00F5D4;--source-local:#9db8cf;--source-kuwo:#FF8C00;--source-kugou:#9B59B6}
 :root{--glass-bg:linear-gradient(112deg,rgba(72,74,76,.62),rgba(24,27,30,.70) 48%,rgba(8,12,14,.74));--glass-bg-focus:linear-gradient(112deg,rgba(88,91,92,.68),rgba(28,32,35,.76) 50%,rgba(8,13,15,.82));--glass-border:rgba(0,245,212,.30);--glass-border-soft:rgba(255,255,255,.095);--glass-shadow:0 22px 64px rgba(0,0,0,.30),0 0 34px rgba(0,245,212,.052),inset 0 1px 0 rgba(255,255,255,.16),inset 0 -24px 58px rgba(0,0,0,.16);--glass-shadow-focus:0 24px 72px rgba(0,0,0,.34),0 0 0 1px rgba(0,245,212,.13),0 0 42px rgba(0,245,212,.075),inset 0 1px 0 rgba(255,255,255,.20)}
 :root{--saved-panel-glass-bg:rgba(0,0,0,.10);--saved-panel-glass-filter:blur(12px) saturate(1.8) brightness(1.16);--saved-panel-glass-svg-filter:url(#mineradio-control-glass-filter) saturate(1);--saved-panel-glass-shadow:inset 0 0 2px 1px rgba(255,255,255,.35),inset 0 0 10px 4px rgba(255,255,255,.15),0 4px 16px rgba(17,17,26,.05),0 8px 24px rgba(17,17,26,.05),0 16px 56px rgba(17,17,26,.05),inset 0 4px 16px rgba(17,17,26,.05),inset 0 8px 24px rgba(17,17,26,.05),inset 0 16px 56px rgba(17,17,26,.05);--saved-panel-glass-radius:50px;--saved-button-glass-bg:rgba(0,0,0,.10);--saved-button-glass-filter:blur(12px) saturate(1.8) brightness(1.16);--saved-button-glass-svg-filter:url(#mineradio-control-glass-filter) saturate(1);--saved-button-glass-shadow:inset 0 0 2px 1px rgba(255,255,255,.34),inset 0 0 10px 4px rgba(255,255,255,.13),0 10px 30px rgba(0,0,0,.18);--saved-button-glass-hover-bg:rgba(255,255,255,.055);--saved-button-glass-hover-shadow:inset 0 0 2px 1px rgba(255,255,255,.42),inset 0 0 12px 5px rgba(255,255,255,.17),0 12px 34px rgba(0,0,0,.22),0 0 18px rgba(255,255,255,.06)}
 :root{--home-icon-color:#f4d28a;--home-icon-rgb:244,210,138;--visual-icon-color:#7fd8ff;--visual-icon-rgb:127,216,255}
@@ -494,6 +494,8 @@ body.desktop-shell.empty-home-active.controls-visible #empty-home{bottom:126px}
 .account-source-dot{width:7px;height:7px;border-radius:50%;background:var(--source-local);box-shadow:0 0 12px currentColor;flex-shrink:0}
 .account-source-dot.netease{background:var(--source-netease);color:var(--source-netease)}
 .account-source-dot.qq{background:var(--source-qq);color:var(--source-qq)}
+.account-source-dot.kuwo{background:var(--source-kuwo);color:var(--source-kuwo)}
+.account-source-dot.kugou{background:var(--source-kugou);color:var(--source-kugou)}
 .top-account-pill{height:44px;min-width:0;display:flex;align-items:center;gap:8px;padding:0 14px 0 4px;border-radius:24px;border:1px solid rgba(244,210,138,.52);background:rgba(244,210,138,.07);box-shadow:0 0 0 1px rgba(244,210,138,.08),0 14px 42px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.08);transition:background .22s,border-color .22s,box-shadow .22s,transform .22s}
 #user-btn.multi-account:hover .top-account-pill{background:rgba(244,210,138,.10);border-color:rgba(244,210,138,.62);box-shadow:0 0 0 1px rgba(244,210,138,.10),0 16px 44px rgba(0,0,0,.32),inset 0 1px 0 rgba(255,255,255,.10)}
 .top-account-pill img{width:34px;height:34px;border-radius:50%;object-fit:cover;background:rgba(255,255,255,.08);flex-shrink:0}
@@ -1957,6 +1959,8 @@ html.control-glass-svg-ok #visual-guide-btn:hover{
       <button id="search-mode-song" class="active" type="button" onclick="setSearchMode('song')" aria-selected="true">All</button>
       <button id="search-mode-netease" type="button" onclick="setSearchMode('netease')" aria-selected="false">NE</button>
       <button id="search-mode-qq" type="button" onclick="setSearchMode('qq')" aria-selected="false">QQ</button>
+      <button id="search-mode-kuwo" type="button" onclick="setSearchMode('kuwo')" aria-selected="false">KW</button>
+      <button id="search-mode-kugou" type="button" onclick="setSearchMode('kugou')" aria-selected="false">KG</button>
       <button id="search-mode-podcast" type="button" onclick="setSearchMode('podcast')" aria-selected="false">Podcast</button>
     </div>
     <div id="search-results"></div>
@@ -16689,6 +16693,8 @@ function songDurationLabel(song) {
 function songSourceLabel(song) {
   if (!song) return '未知';
   if (song.provider === 'qq' || song.source === 'qq' || song.type === 'qq') return 'QQ 音乐';
+  if (song.provider === 'kuwo' || song.source === 'kuwo') return '酷我音乐';
+  if (song.provider === 'kugou' || song.source === 'kugou') return '酷狗音乐';
   if (song.type === 'local') return '本地上传';
   if (song.type === 'podcast' || song.source === 'podcast') return '网易云播客';
   return '网易云音乐';
@@ -17636,6 +17642,16 @@ function updateSearchModeTabs() {
     podcastBtn.classList.toggle('active', searchMode === 'podcast');
     podcastBtn.setAttribute('aria-selected', searchMode === 'podcast' ? 'true' : 'false');
   }
+  var kuwoBtn = document.getElementById('search-mode-kuwo');
+  if (kuwoBtn) {
+    kuwoBtn.classList.toggle('active', searchMode === 'kuwo');
+    kuwoBtn.setAttribute('aria-selected', searchMode === 'kuwo' ? 'true' : 'false');
+  }
+  var kugouBtn = document.getElementById('search-mode-kugou');
+  if (kugouBtn) {
+    kugouBtn.classList.toggle('active', searchMode === 'kugou');
+    kugouBtn.setAttribute('aria-selected', searchMode === 'kugou' ? 'true' : 'false');
+  }
   if ($input) {
     $input.placeholder = searchMode === 'podcast'
       ? '搜索播客、电台...'
@@ -17644,7 +17660,7 @@ function updateSearchModeTabs() {
   requestAnimationFrame(updateSearchPillGlassDisplacementMap);
 }
 function setSearchMode(mode) {
-  mode = (mode === 'podcast' || mode === 'netease' || mode === 'qq') ? mode : 'song';
+  mode = (mode === 'podcast' || mode === 'netease' || mode === 'qq' || mode === 'kuwo' || mode === 'kugou') ? mode : 'song';
   if (searchMode === mode) return;
   searchMode = mode;
   updateSearchModeTabs();
@@ -17858,20 +17874,17 @@ document.addEventListener('click', function(e){
 updateSearchModeTabs();
 
 function songProviderKey(song) {
-  if (song && (song.provider === 'qq' || song.source === 'qq' || song.type === 'qq')) return 'qq';
+  if (song) {
+    if (song.provider === 'qq' || song.source === 'qq' || song.type === 'qq') return 'qq';
+    if (song.provider === 'kuwo' || song.source === 'kuwo') return 'kuwo';
+    if (song.provider === 'kugou' || song.source === 'kugou') return 'kugou';
+  }
   return 'netease';
 }
 function songSourceTagHtml(song) {
   var key = songProviderKey(song);
-  var label = key === 'qq' ? 'QQ' : 'NE';
-  return '<span class="tag-source ' + key + '">' + label + '</span>';
-}
-function searchResultMetaText(song) {
-  var bits = [];
-  if (song.artist) bits.push(song.artist);
-  if (song.album) bits.push(song.album);
-  if (songProviderKey(song) === 'qq' && !song.playable) bits.push('QQ 播放需会话/授权');
-  return bits.join('  ·  ') || songSourceLabel(song);
+  var labels = { 'netease': 'NE', 'qq': 'QQ', 'kuwo': 'KW', 'kugou': 'KG' };
+  return '<span class="tag-source ' + key + '">' + (labels[key] || key) + '</span>';
 }
 function searchResultMetaHtml(song, index) {
   song = song || {};
@@ -17981,7 +17994,7 @@ function scoreSongSearchResult(song, q, sourceIndex) {
   score -= (sourceIndex || 0) * 0.75;
   return score;
 }
-function mergeSongSearchResults(neteaseSongs, qqSongs, limit, q) {
+function mergeSongSearchResults(neteaseSongs, qqSongs, limit, q, extraSongs) {
   var out = [];
   var seen = {};
   function push(song, sourceIndex) {
@@ -18006,14 +18019,27 @@ async function fetchMusicSearchResults(q, mode) {
     var neOnly = await apiJson('/api/search?keywords=' + encodeURIComponent(q) + '&limit=18');
     return mergeSongSearchResults(neOnly.songs || [], [], 18, q);
   }
+  if (mode === 'kuwo') {
+    var kw = await apiJson('/api/kuwo/search?keywords=' + encodeURIComponent(q) + '&limit=12');
+    return (kw.songs || []).map(function(s){ s.source = 'kuwo'; return s; });
+  }
+  if (mode === 'kugou') {
+    var kg = await apiJson('/api/kugou/search?keywords=' + encodeURIComponent(q) + '&limit=12');
+    return (kg.songs || []).map(function(s){ s.source = 'kugou'; return s; });
+  }
   var result = await Promise.allSettled([
     apiJson('/api/search?keywords=' + encodeURIComponent(q) + '&limit=14'),
-    apiJson('/api/qq/search?keywords=' + encodeURIComponent(q) + '&limit=12')
+    apiJson('/api/qq/search?keywords=' + encodeURIComponent(q) + '&limit=12'),
+    apiJson('/api/kuwo/search?keywords=' + encodeURIComponent(q) + '&limit=6'),
+    apiJson('/api/kugou/search?keywords=' + encodeURIComponent(q) + '&limit=6'),
   ]);
   var neteaseSongs = result[0].status === 'fulfilled' ? ((result[0].value && result[0].value.songs) || []) : [];
   var qqSongs = result[1].status === 'fulfilled' ? ((result[1].value && result[1].value.songs) || []) : [];
-  if (result[1].status === 'rejected') console.warn('QQ search failed:', result[1].reason);
-  return mergeSongSearchResults(neteaseSongs, qqSongs, 18, q);
+  var kuwoSongs = result[2].status === 'fulfilled' ? ((result[2].value && result[2].value.songs) || []) : [];
+  var kugouSongs = result[3].status === 'fulfilled' ? ((result[3].value && result[3].value.songs) || []) : [];
+  if (kuwoSongs.length) kuwoSongs.forEach(function(s){ s.source = 'kuwo'; });
+  if (kugouSongs.length) kugouSongs.forEach(function(s){ s.source = 'kugou'; });
+  return mergeSongSearchResults(neteaseSongs, qqSongs, 18, q, kuwoSongs.concat(kugouSongs));
 }
 function renderSongSearchResults(songs) {
   playlist = songs || [];
@@ -18926,15 +18952,24 @@ async function playQueueAt(idx, opts) {
   try {
     markPlayPhase('source-url');
     var isQQPlayback = songProviderKey(song) === 'qq';
+    var isKuwoPlayback = songProviderKey(song) === 'kuwo';
+    var isKugouPlayback = songProviderKey(song) === 'kugou';
     var requestedQuality = normalizePlaybackQuality(opts.qualityOverride || playbackQuality);
     if (!isQQPlayback && requestedQuality === 'jymaster' && !hasProviderSvip('netease', loginStatus)) requestedQuality = 'hires';
     if (isQQPlayback && qqPlaybackQualityCeiling && (requestedQuality === 'jymaster' || requestedQuality === 'hires' || requestedQuality === 'lossless')) {
       requestedQuality = qqPlaybackQualityCeiling;
     }
     var qualityParam = '&quality=' + encodeURIComponent(requestedQuality);
-    var data = isQQPlayback
-      ? await apiJson('/api/qq/song/url?mid=' + encodeURIComponent(song.mid || song.songmid || song.id || '') + '&mediaMid=' + encodeURIComponent(song.mediaMid || song.media_mid || '') + qualityParam)
-      : await apiJson('/api/song/url?id=' + song.id + qualityParam);
+    var data;
+    if (isQQPlayback) {
+      data = await apiJson('/api/qq/song/url?mid=' + encodeURIComponent(song.mid || song.songmid || song.id || '') + '&mediaMid=' + encodeURIComponent(song.mediaMid || song.media_mid || '') + qualityParam);
+    } else if (isKuwoPlayback) {
+      data = await apiJson('/api/kuwo/song/url?mid=' + encodeURIComponent(song.mid || song.id || ''));
+    } else if (isKugouPlayback) {
+      data = await apiJson('/api/kugou/song/url?hash=' + encodeURIComponent(song.mid || song.id || '') + '&albumId=' + encodeURIComponent(song.albumId || ''));
+    } else {
+      data = await apiJson('/api/song/url?id=' + song.id + qualityParam);
+    }
     if (token !== trackSwitchToken) return;
     if (!data.url) {
       if (isQQPlayback && await retryQQPlaybackWithCompatibleQuality(song, idx, token, opts, data, requestedQuality)) return;

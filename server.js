@@ -2886,6 +2886,151 @@ async function handleQQLyric(mid, id) {
   };
 }
 
+async function handleKugouArtistDetail(hash, albumId) {
+  if (!hash) return { provider: 'kugou', error: 'MISSING_HASH', artist: null, songs: [] };
+  try {
+    const url = `https://www.kugou.com/yy/index.php?r=play/getdata&hash=${encodeURIComponent(hash)}&album_id=${encodeURIComponent(albumId || '')}`;
+    const r = await fetch(url, { headers: { 'User-Agent': UA, 'Cookie': kugouCookie } });
+    const data = await r.json();
+    if (data && data.data) {
+      const song = mapKugouSong(data.data, hash);
+      return { provider: 'kugou', artist: { name: data.data.author_name || '' }, songs: song ? [song] : [] };
+    }
+    return { provider: 'kugou', error: 'NO_DATA', artist: null, songs: [] };
+  } catch (err) {
+    console.error('[KugouArtistDetail]', err);
+    return { provider: 'kugou', error: err.message, artist: null, songs: [] };
+  }
+}
+
+async function handleKugouSearch(keywords, limit) {
+  const kw = String(keywords || '').trim();
+  if (!kw) return [];
+  try {
+    const r = await fetch(
+      `https://song-search.kugou.com/song_search_v2?keyword=${encodeURIComponent(kw)}&page=1&pagesize=${Math.min(limit, 30)}&platform=WebFilter&filter=0&iscorrection=1`,
+      { headers: { 'User-Agent': UA, 'Cookie': kugouCookie } }
+    );
+    const data = await r.json();
+    const songs = [];
+    if (data && data.data && data.data.lists) {
+      data.data.lists.forEach(item => {
+        const song = mapKugouSong(item);
+        if (song && song.name) songs.push(song);
+      });
+    }
+    return songs;
+  } catch (err) {
+    console.error('[KugouSearch]', err);
+    return [];
+  }
+}
+
+function mapKugouSong(item, hash) {
+  const itemHash = hash || item['K bit'] || item.hash || '';
+  const albumId = item.album_id || item.AlbumID || '';
+  if (!itemHash && !item.FileHash) return null;
+  const finalHash = itemHash || item.FileHash || '';
+  return {
+    id: finalHash,
+    mid: finalHash,
+    name: item.SongName || item.songname || item.name || item.song_name || '',
+    artist: item.ChoricSinger || item.singername || item.author_name || item.singer_name || item.artist || '',
+    album: item.AlbumName || item.album_name || item.album || '',
+    albumId: albumId,
+    albumCover: item.cover || item.img || item.album_img || '',
+    source: 'kugou',
+    sourceKey: 'kugou',
+    duration: parseInt(item.duration || item.timelength || 0) / 1000 || 0,
+  };
+}
+
+let kuwoCookie = '';
+let kugouCookie = '';
+
+function saveKuwoCookie(c) {
+  kuwoCookie = String(c || '').trim();
+}
+
+async function handleKuwoSearch(keywords, limit) {
+  const kw = String(keywords || '').trim();
+  if (!kw) return [];
+  try {
+    const r = await fetch(
+      `https://kuwo.cn/api/www/search/searchMusicBykeyWord?key=${encodeURIComponent(kw)}&pn=1&rn=${Math.min(limit, 30)}`,
+      { headers: { 'User-Agent': UA, 'Cookie': kuwoCookie, 'Referer': 'https://kuwo.cn/', 'csrf': kuwoCookie.match(/kw_token=([^;]+)/)?.[1] || '' } }
+    );
+    const data = await r.json();
+    const songs = [];
+    if (data && data.data && data.data.list) {
+      data.data.list.forEach(item => {
+        const song = mapKuwoSong(item);
+        if (song && song.name) songs.push(song);
+      });
+    }
+    return songs;
+  } catch (err) {
+    console.error('[KuwoSearch]', err);
+    return [];
+  }
+}
+
+async function handleKuwoSongUrl(mid) {
+  if (!mid) return { provider: 'kuwo', url: '', error: 'MISSING_MID' };
+  try {
+    const r = await fetch(
+      `https://kuwo.cn/api/v1/www/music/playUrl?mid=${encodeURIComponent(mid)}&type=convert_url3&br=320kmp3`,
+      { headers: { 'User-Agent': UA, 'Cookie': kuwoCookie, 'Referer': 'https://kuwo.cn/', 'csrf': kuwoCookie.match(/kw_token=([^;]+)/)?.[1] || '' } }
+    );
+    const data = await r.json();
+    if (data && data.code === 200 && data.data && data.data.url) {
+      return { provider: 'kuwo', url: data.data.url };
+    }
+    // fallback: 尝试低音质
+    const r2 = await fetch(
+      `https://kuwo.cn/api/v1/www/music/playUrl?mid=${encodeURIComponent(mid)}&type=convert_url3&br=128kmp3`,
+      { headers: { 'User-Agent': UA, 'Cookie': kuwoCookie, 'Referer': 'https://kuwo.cn/', 'csrf': kuwoCookie.match(/kw_token=([^;]+)/)?.[1] || '' } }
+    );
+    const data2 = await r2.json();
+    if (data2 && data2.code === 200 && data2.data && data2.data.url) {
+      return { provider: 'kuwo', url: data2.data.url, quality: '128k' };
+    }
+    return { provider: 'kuwo', url: '', error: 'NO_PLAYABLE_URL' };
+  } catch (err) {
+    console.error('[KuwoSongUrl]', err);
+    return { provider: 'kuwo', url: '', error: err.message };
+  }
+}
+
+async function handleKuwoLoginCookie(body) {
+  try {
+    const raw = body.cookie || body.data || body.text || '';
+    const normalized = String(raw || '').trim();
+    if (!normalized) return { provider: 'kuwo', loggedIn: false, error: 'MISSING_COOKIE' };
+    saveKuwoCookie(normalized);
+    // 验证 cookie 有效性
+    const r = await fetch('https://kuwo.cn/', { headers: { 'Cookie': kuwoCookie, 'User-Agent': UA } });
+    const hasLogin = r.headers.get('set-cookie') ? kuwoCookie.includes('kw_token') : false;
+    return { provider: 'kuwo', loggedIn: hasLogin || kuwoCookie.length > 20, saved: true };
+  } catch (err) {
+    return { provider: 'kuwo', loggedIn: false, error: err.message };
+  }
+}
+
+function mapKuwoSong(item) {
+  return {
+    id: String(item.mid || item.id || ''),
+    mid: String(item.mid || item.id || ''),
+    name: item.name || item.songName || item.title || '',
+    artist: item.artist || item.singer || item.author || '',
+    album: item.album || item.albumName || '',
+    albumCover: item.pic || item.cover || item.artistPic || '',
+    source: 'kuwo',
+    sourceKey: 'kuwo',
+    duration: parseInt(item.duration || item.songTimeMinutes || 0) || 0,
+  };
+}
+
 function mapPodcastRadio(r) {
   r = r || {};
   const dj = r.dj || r.djSimple || r.djUser || r.creator || {};
@@ -3409,6 +3554,106 @@ const server = http.createServer(async (req, res) => {
       console.error('[WeatherIpLocation]', err);
       sendJSON(res, { ok: false, error: err.message, location: null }, 500);
     }
+    return;
+  }
+
+  // ---------- 酷我音乐 ----------
+  if (pn === '/api/kuwo/search') {
+    try {
+      const kw = url.searchParams.get('keywords') || '';
+      const limit = Math.max(4, Math.min(20, parseInt(url.searchParams.get('limit') || '10', 10) || 10));
+      const songs = await handleKuwoSearch(kw, limit);
+      sendJSON(res, { provider: 'kuwo', songs });
+    } catch (err) {
+      console.error('[KuwoSearch]', err);
+      sendJSON(res, { provider: 'kuwo', error: err.message, songs: [] }, 500);
+    }
+    return;
+  }
+
+  if (pn === '/api/kuwo/song/url') {
+    try {
+      const mid = url.searchParams.get('mid') || url.searchParams.get('id') || '';
+      const info = await handleKuwoSongUrl(mid);
+      sendJSON(res, info);
+    } catch (err) {
+      console.error('[KuwoSongUrl]', err);
+      sendJSON(res, { provider: 'kuwo', url: '', error: err.message }, 500);
+    }
+    return;
+  }
+
+  if (pn === '/api/kuwo/login/cookie') {
+    try {
+      const body = await readRequestBody(req);
+      const info = await handleKuwoLoginCookie(body);
+      sendJSON(res, info);
+    } catch (err) {
+      console.error('[KuwoLoginCookie]', err);
+      sendJSON(res, { provider: 'kuwo', loggedIn: false, error: err.message }, 500);
+    }
+    return;
+  }
+
+  if (pn === '/api/kuwo/logout') {
+    saveKuwoCookie('');
+    sendJSON(res, { provider: 'kuwo', ok: true, loggedIn: false });
+    return;
+  }
+
+  // ---------- 酷狗音乐 ----------
+  if (pn === '/api/kugou/search') {
+    try {
+      const kw = url.searchParams.get('keywords') || '';
+      const limit = Math.max(4, Math.min(20, parseInt(url.searchParams.get('limit') || '10', 10) || 10));
+      const songs = await handleKugouSearch(kw, limit);
+      sendJSON(res, { provider: 'kugou', songs });
+    } catch (err) {
+      console.error('[KugouSearch]', err);
+      sendJSON(res, { provider: 'kugou', error: err.message, songs: [] }, 500);
+    }
+    return;
+  }
+
+  if (pn === '/api/kugou/song/url') {
+    try {
+      const hash = url.searchParams.get('hash') || url.searchParams.get('id') || '';
+      const albumId = url.searchParams.get('albumId') || url.searchParams.get('album_id') || '';
+      if (!hash) { sendJSON(res, { provider: 'kugou', url: '', error: 'MISSING_HASH' }); return; }
+      const r = await fetch(`https://www.kugou.com/yy/index.php?r=play/getdata&hash=${encodeURIComponent(hash)}&album_id=${encodeURIComponent(albumId || '')}`, {
+        headers: { 'User-Agent': UA, 'Cookie': kugouCookie, 'Referer': 'https://www.kugou.com/' }
+      });
+      const data = await r.json();
+      if (data && data.data && data.data.play_url) {
+        sendJSON(res, { provider: 'kugou', url: data.data.play_url });
+      } else {
+        sendJSON(res, { provider: 'kugou', url: '', error: 'NO_PLAYABLE_URL' });
+      }
+    } catch (err) {
+      console.error('[KugouSongUrl]', err);
+      sendJSON(res, { provider: 'kugou', url: '', error: err.message }, 500);
+    }
+    return;
+  }
+
+  if (pn === '/api/kugou/login/cookie') {
+    try {
+      const body = await readRequestBody(req);
+      const raw = body.cookie || body.data || body.text || '';
+      const normalized = String(raw || '').trim();
+      if (!normalized) { sendJSON(res, { provider: 'kugou', loggedIn: false, error: 'MISSING_COOKIE' }); return; }
+      kugouCookie = normalized;
+      sendJSON(res, { provider: 'kugou', loggedIn: true, saved: true });
+    } catch (err) {
+      console.error('[KugouLoginCookie]', err);
+      sendJSON(res, { provider: 'kugou', loggedIn: false, error: err.message }, 500);
+    }
+    return;
+  }
+
+  if (pn === '/api/kugou/logout') {
+    kugouCookie = '';
+    sendJSON(res, { provider: 'kugou', ok: true, loggedIn: false });
     return;
   }
 
