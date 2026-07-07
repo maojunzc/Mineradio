@@ -9,6 +9,7 @@
 <script src="vendor/three.r128.min.js"></script>
 <script src="vendor/music-tempo.min.js"></script>
 <script src="vendor/gsap.min.js"></script>
+<script src="vendor/pinyin-pro.min.js"></script>
 <script>
 try {
   document.documentElement.classList.add(localStorage.getItem('mineradio-diy-player-mode-v1') === '1' ? 'diy-mode-preload' : 'simple-mode-preload');
@@ -18053,6 +18054,7 @@ function scoreSongSearchResult(song, q, sourceIndex) {
     if (originalArtists.length && searchLooksLikeSameTitleCover(song, nq, name, album, raw, originalArtistMatch, sourceIndex)) score -= 46;
   }
   score -= (sourceIndex || 0) * 0.75;
+  score += tryPinyinBoost(song, q);
   return score;
 }
 function mergeSongSearchResults(neteaseSongs, qqSongs, limit, q, extraSongs) {
@@ -18130,6 +18132,24 @@ function renderSongSearchResults(songs) {
   syncLikeStatusForSongs(playlist);
   if (window.gsap) animateListItems($results, '.search-result', { x: 0, y: 6, stagger: 0.012, duration: 0.18, limit: 18 });
 }
+
+// ── Chinese pinyin initial search support ──
+var _pinyinMatchCache = {};
+function tryPinyinBoost(song, q) {
+  if (!q || q.length < 2 || !/^[a-z]+$/.test(q)) return 0;
+  var name = song && song.name;
+  if (!name) return 0;
+  try {
+    var cacheKey = name + '|' + q;
+    if (_pinyinMatchCache[cacheKey] === undefined) {
+      _pinyinMatchCache[cacheKey] = (typeof pinyinPro !== 'undefined' && pinyinPro.match)
+        ? (pinyinPro.match(name, q) ? 1 : 0)
+        : 0;
+    }
+    return _pinyinMatchCache[cacheKey] ? 95 : 0;
+  } catch (e) { return 0; }
+}
+// ── end pinyin boost ──
 
 async function doSearch(q, opts) {
   opts = opts || {};
@@ -19199,8 +19219,8 @@ async function attemptAudioPlay(opts) {
       if (!audioReady) initAudio();
       if (opts.fade !== false) preparePlaybackFadeIn();
       if (opts.manual) {
-        var manualPlay = audio.play();
         await resumeAudioAnalysis();
+        var manualPlay = audio.play();
         await manualPlay;
       } else {
         await resumeAudioAnalysis();
