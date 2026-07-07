@@ -1969,6 +1969,10 @@ html.control-glass-svg-ok #visual-guide-btn:hover{
     <button id="upload-btn" class="icon-btn" onclick="document.getElementById('file-input').click()" title="导入音乐或封面">
       <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
     </button>
+    <button id="lyric-import-btn" class="icon-btn" onclick="document.getElementById('lrc-input').click()" title="导入本地歌词文件 (.lrc)">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M10 18h10"/><circle cx="6" cy="18" r="2"/></svg>
+    </button>
+    <input id="lrc-input" type="file" accept=".lrc,.txt" style="display:none" onchange="importLrcFromFile(this.files[0]);this.value=''">
     <button id="clear-cover-btn" class="icon-btn" onclick="clearCustomCoverForCurrent()" title="取消自定义封面" aria-label="取消自定义封面">×</button>
     <div id="upload-tip" role="status" aria-live="polite">
       <button class="upload-tip-close" onclick="closeUploadTip(true)" aria-label="关闭提示">×</button>
@@ -16438,6 +16442,63 @@ function openPodcastDetail(id) {
   }).catch(function(){ showToast('播客详情加载失败'); });
 }
 
+// ── LRC 歌词解析 ──
+function parseLrc(text) {
+  if (!text) return [];
+  var lines = text.split('\n');
+  var result = [];
+  var timeRe = /\[(\d{1,3}):(\d{2})(?:[\.:](\d{1,3}))?\]/g;
+  lines.forEach(function(line) {
+    var match;
+    while ((match = timeRe.exec(line)) !== null) {
+      var min = parseInt(match[1]) || 0;
+      var sec = parseInt(match[2]) || 0;
+      var ms = parseInt(match[3] || '0');
+      if (match[3] && match[3].length === 2) ms *= 10;
+      var time = min * 60 + sec + ms / 1000;
+      var text = line.replace(timeRe, '').trim();
+      if (text) result.push({ time: time, text: text });
+    }
+  });
+  result.sort(function(a, b) { return a.time - b.time; });
+  return result;
+}
+
+// ── 导入本地 LRC 歌词 ──
+function importLrcFromFile(file) {
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var text = e.target.result;
+    var parsed = parseLrc(text);
+    if (!parsed.length) { showToast('歌词文件格式无法解析'); return; }
+    var song = playQueue && currentIdx >= 0 ? playQueue[currentIdx] : null;
+    if (!song) { showToast('请先播放一首歌曲'); return; }
+    var key = song.id || song.mid || (song.name + '|' + song.artist);
+    try {
+      var map = JSON.parse(localStorage.getItem('mineradio-custom-lyrics-v1') || '{}');
+      map[key] = { text: text, parsed: parsed, importedAt: Date.now(), songName: song.name, artist: song.artist };
+      localStorage.setItem('mineradio-custom-lyrics-v1', JSON.stringify(map));
+      // 立即应用到当前播放
+      if (typeof setOriginalLyricsState === 'function') {
+        setOriginalLyricsState(parsed, true, 'custom');
+      }
+      showToast('歌词已导入 (' + parsed.length + ' 行)');
+    } catch (err) {
+      showToast('歌词保存失败');
+    }
+  };
+  reader.readAsText(file);
+}
+
+function getCustomLyrics(key) {
+  if (!key) return null;
+  try {
+    var map = JSON.parse(localStorage.getItem('mineradio-custom-lyrics-v1') || '{}');
+    return map[key] || null;
+  } catch (e) { return null; }
+}
+
 // ── 快捷搜索风格 ──
 function searchGenre(genre) {
   var input = document.getElementById('search-input');
@@ -19536,6 +19597,12 @@ async function fetchLyric(songOrId, token) {
     var lines = withLyricFallback(nativeLines.length ? nativeLines : lrcLines);
     if (lines.length && lines[0].fallback) timingSource = 'fallback';
     setOriginalLyricsState(lines, hasNativeKaraoke, timingSource);
+    // 检查是否存在用户导入的自定义歌词，如果有则覆盖
+    var customKey = song ? (song.id || song.mid || (song.name + '|' + song.artist)) : '';
+    var customLrc = customKey ? getCustomLyrics(customKey) : null;
+    if (customLrc && customLrc.parsed && customLrc.parsed.length) {
+      setOriginalLyricsState(customLrc.parsed, false, 'custom');
+    }
     applyPreferredLyricsForCurrent(true);
   } catch (e) {
     if (token !== trackSwitchToken) return;

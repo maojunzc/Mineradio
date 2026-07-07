@@ -4277,6 +4277,34 @@ const server = http.createServer(async (req, res) => {
         body = r.body || body || {};
         source = 'lyric';
       }
+      // 歌词仍为空时尝试 song_detail 解析网盘/云盘歌曲的真实 ID
+      if (!((body.lrc && body.lrc.lyric) || (body.yrc && body.yrc.lyric))) {
+        try {
+          const detail = await song_detail({ ids: id, cookie: userCookie, timestamp: Date.now() });
+          const songs = detail.body && (detail.body.songs || detail.body.data);
+          if (songs && songs.length) {
+            const realId = String(songs[0].id || '');
+            if (realId && realId !== id) {
+              if (typeof lyric_new === 'function') {
+                const retry = await lyric_new({ id: realId, cookie: userCookie, timestamp: Date.now() });
+                if (retry.body && ((retry.body.lrc && retry.body.lrc.lyric) || (retry.body.yrc && retry.body.yrc.lyric))) {
+                  body = retry.body;
+                  source = 'lyric_new_resolved';
+                }
+              }
+              if (!((body.lrc && body.lrc.lyric) || (body.yrc && body.yrc.lyric))) {
+                const retry2 = await lyric({ id: realId, cookie: userCookie, timestamp: Date.now() });
+                if (retry2.body && ((retry2.body.lrc && retry2.body.lrc.lyric) || (retry2.body.yrc && retry2.body.yrc.lyric))) {
+                  body = retry2.body;
+                  source = 'lyric_resolved';
+                }
+              }
+            }
+          }
+        } catch (resolveErr) {
+          console.warn('[LyricResolve]', resolveErr.message);
+        }
+      }
       sendJSON(res, {
         lyric: (body.lrc && body.lrc.lyric) || '',
         tlyric: (body.tlyric && body.tlyric.lyric) || '',
